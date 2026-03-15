@@ -2,10 +2,11 @@ import AppLayout from '@/components/AppLayout';
 import HeroGreeting from './components/HeroGreeting';
 import QuickFeatureCards from './components/QuickFeatureCards';
 import DailyQuoteCard from './components/DailyQuoteCard';
+import WellnessTips from './components/WellnessTips';
 import SoundCards from './components/SoundCards';
 import CommunityPreview from './components/CommunityPreview';
-import WellnessTips from './components/WellnessTips';
 import FloatingDoodles from './components/FloatingDoodles';
+import StreakTracker from './components/StreakTracker';
 
 export default function HomeDashboardPage() {
   return (
@@ -13,11 +14,12 @@ export default function HomeDashboardPage() {
       <div className="relative space-y-6 py-2">
         <FloatingDoodles />
         <HeroGreeting />
+        <StreakTracker />
         <QuickFeatureCards />
         <DailyQuoteCard />
+        <WellnessTips />
         <SoundCards />
         <CommunityPreview />
-        <WellnessTips />
         <div className="h-4" />
       </div>
     </AppLayout>

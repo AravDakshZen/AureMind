@@ -15,7 +15,7 @@ const features = [
   {
     title: 'Mind Tests',
     desc: 'Self-reflection quizzes',
-    emoji: '🔮',
+    emoji: '🧠',
     gradient: 'gradient-blue',
     path: '/psychology-tests',
     textColor: 'text-blue-800',
@@ -23,7 +23,7 @@ const features = [
   {
     title: 'My Diary',
     desc: 'Track your journey',
-    emoji: '📖',
+    emoji: '📔',
     gradient: 'gradient-peach',
     path: '/mood-tracker-diary',
     textColor: 'text-pink-800',
@@ -72,7 +72,7 @@ export default function QuickFeatureCards() {
             onClick={() => router?.push(f?.path)}
             className={`${f?.gradient} rounded-3xl p-4 flex flex-col items-center gap-2 shadow-sm border border-white/60 cursor-pointer transition-all duration-300`}
           >
-            <span className="text-3xl float-doodle">{f?.emoji}</span>
+            <span className="text-3xl">{f?.emoji}</span>
             <div className="text-center">
               <p className={`font-nunito font-700 text-xs ${f?.textColor} leading-tight`}>{f?.title}</p>
               <p className={`text-[10px] font-dm ${f?.textColor} opacity-70 leading-tight mt-0.5 hidden sm:block`}>{f?.desc}</p>
