@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Heart, BookOpen } from 'lucide-react';
+import { Heart, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const quotes = [
   { text: "You don't have to be positive all the time. It's perfectly okay to feel sad, angry, annoyed, or overwhelmed.", author: 'Lori Deschene', category: 'Acceptance', emoji: '🌧️', gradient: 'from-blue-100 via-purple-100 to-pink-100' },
@@ -45,28 +45,42 @@ const quotes = [
 export default function MotivationHero() {
   const [idx, setIdx] = useState(0);
   const [liked, setLiked] = useState<number[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [direction, setDirection] = useState<'left' | 'right'>('left');
   const [savedMsg, setSavedMsg] = useState('');
+
+  // Touch swipe state
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const q = quotes[idx];
   const isLiked = liked.includes(idx);
 
-  const refresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      setIdx((prev) => (prev + 1) % quotes.length);
-      setIsRefreshing(false);
-    }, 400);
+  const goNext = useCallback(() => {
+    setDirection('left');
+    setIdx((prev) => (prev + 1) % quotes.length);
+  }, []);
+
+  const goPrev = useCallback(() => {
+    setDirection('right');
+    setIdx((prev) => (prev - 1 + quotes.length) % quotes.length);
+  }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   };
 
-  const randomQuote = () => {
-    setIsRefreshing(true);
-    setTimeout(() => {
-      let next = Math.floor(Math.random() * quotes.length);
-      while (next === idx) next = Math.floor(Math.random() * quotes.length);
-      setIdx(next);
-      setIsRefreshing(false);
-    }, 400);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    // Only trigger if horizontal swipe is dominant
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx < 0) goNext(); // swipe left = next
+      else goPrev();        // swipe right = prev
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const toggleLike = () => {
@@ -82,94 +96,113 @@ export default function MotivationHero() {
     setTimeout(() => setSavedMsg(''), 2000);
   };
 
+  const variants = {
+    enter: (dir: 'left' | 'right') => ({ opacity: 0, x: dir === 'left' ? 60 : -60 }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: 'left' | 'right') => ({ opacity: 0, x: dir === 'left' ? -60 : 60 }),
+  };
+
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={idx}
-        initial={{ opacity: 0, y: 20, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -20, scale: 0.97 }}
-        transition={{ duration: 0.4 }}
-        className={`relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br ${q.gradient} border border-white/60 shadow-lg`}
+    <div className="relative select-none">
+      {/* Desktop left arrow */}
+      <button
+        onClick={goPrev}
+        className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md border border-purple-100 items-center justify-center text-purple-500 hover:text-purple-700 transition-all"
+        aria-label="Previous quote"
       >
-        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/20 blur-2xl" />
-        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
+        <ChevronLeft size={20} />
+      </button>
 
-        {savedMsg && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-white/90 text-purple-700 text-xs font-dm px-3 py-1.5 rounded-full shadow-md z-20">
-            {savedMsg}
-          </div>
-        )}
+      {/* Desktop right arrow */}
+      <button
+        onClick={goNext}
+        className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md border border-purple-100 items-center justify-center text-purple-500 hover:text-purple-700 transition-all"
+        aria-label="Next quote"
+      >
+        <ChevronRight size={20} />
+      </button>
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2">
-              <motion.span
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="text-2xl"
-              >
-                {q.emoji}
-              </motion.span>
-              <span className="text-xs font-dm px-2.5 py-1 rounded-full bg-white/50 text-purple-700 border border-white/60">
-                {q.category}
-              </span>
-              <span className="text-[10px] font-dm text-purple-500">{idx + 1}/{quotes.length}</span>
+      <AnimatePresence mode="wait" custom={direction}>
+        <motion.div
+          key={idx}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.35, ease: 'easeInOut' }}
+          className={`relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br ${q.gradient} border border-white/60 shadow-lg cursor-grab active:cursor-grabbing`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/20 blur-2xl" />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/20 blur-2xl" />
+
+          {savedMsg && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-white/90 text-purple-700 text-xs font-dm px-3 py-1.5 rounded-full shadow-md z-20 whitespace-nowrap">
+              {savedMsg}
             </div>
-            <div className="flex gap-2">
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={saveToJournal}
-                className="w-8 h-8 rounded-xl bg-white/50 hover:bg-white/80 flex items-center justify-center text-purple-600 transition-all"
-              >
-                <BookOpen size={15} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={toggleLike}
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isLiked ? 'bg-pink-200 text-pink-600' : 'bg-white/50 text-purple-400 hover:bg-white/80'}`}
-              >
-                <Heart size={15} fill={isLiked ? 'currentColor' : 'none'} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={refresh}
-                className="w-8 h-8 rounded-xl bg-white/50 hover:bg-white/80 flex items-center justify-center text-purple-500 transition-all"
-              >
-                <motion.div animate={{ rotate: isRefreshing ? 360 : 0 }} transition={{ duration: 0.4 }}>
-                  <RefreshCw size={15} />
-                </motion.div>
-              </motion.button>
+          )}
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <motion.span
+                  animate={{ y: [0, -12, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="text-2xl"
+                >
+                  {q.emoji}
+                </motion.span>
+                <span className="text-xs font-dm px-2.5 py-1 rounded-full bg-white/50 text-purple-700 border border-white/60">
+                  {q.category}
+                </span>
+                <span className="text-[10px] font-dm text-purple-500">{idx + 1}/{quotes.length}</span>
+              </div>
+              <div className="flex gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={saveToJournal}
+                  className="w-8 h-8 rounded-xl bg-white/50 hover:bg-white/80 flex items-center justify-center text-purple-600 transition-all"
+                >
+                  <BookOpen size={15} />
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={toggleLike}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isLiked ? 'bg-pink-200 text-pink-600' : 'bg-white/50 text-purple-400 hover:bg-white/80'}`}
+                >
+                  <Heart size={15} fill={isLiked ? 'currentColor' : 'none'} />
+                </motion.button>
+              </div>
+            </div>
+
+            <blockquote className="font-nunito font-600 text-xl text-purple-900 leading-relaxed mb-4">
+              &ldquo;{q.text}&rdquo;
+            </blockquote>
+            <p className="font-dm text-sm text-purple-600">— {q.author}</p>
+
+            {/* Mobile swipe hint */}
+            <p className="md:hidden mt-3 text-center text-[10px] font-dm text-purple-400 opacity-70">
+              ← swipe to browse quotes →
+            </p>
+
+            {/* Dot indicators */}
+            <div className="flex gap-1.5 mt-4 flex-wrap">
+              {quotes.slice(0, 10).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setDirection(i > idx ? 'left' : 'right'); setIdx(i); }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'bg-purple-500 w-6' : 'bg-purple-300/50 w-1.5'}`}
+                />
+              ))}
+              {idx >= 10 && (
+                <div className="h-1.5 w-6 rounded-full bg-pink-400" />
+              )}
             </div>
           </div>
-
-          <blockquote className="font-nunito font-600 text-xl text-purple-900 leading-relaxed mb-4">
-            &ldquo;{q.text}&rdquo;
-          </blockquote>
-          <p className="font-dm text-sm text-purple-600">— {q.author}</p>
-
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={randomQuote}
-            className="mt-4 w-full py-2.5 rounded-2xl bg-white/50 hover:bg-white/70 text-purple-700 font-nunito font-700 text-sm border border-white/60 transition-all"
-          >
-            ✨ Inspire Me (Random Quote)
-          </motion.button>
-
-          <div className="flex gap-1.5 mt-4 flex-wrap">
-            {quotes.slice(0, 10).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setIdx(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? 'bg-purple-500 w-6' : 'bg-purple-300/50 w-1.5'}`}
-              />
-            ))}
-            {idx >= 10 && (
-              <div className="h-1.5 w-6 rounded-full bg-pink-400" />
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }

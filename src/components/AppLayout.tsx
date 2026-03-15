@@ -1,16 +1,33 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import AppLogo from '@/components/ui/AppLogo';
 import { Bell, Settings, X, User, Users, FileText, ChevronRight, Eye, EyeOff, Menu, Home, Users2, BookOpen, Brain, Star, Trash2, Info, Shield, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
+import {
+  registerServiceWorker,
+  requestNotificationPermission,
+  getNotificationPermission,
+  scheduleReminder,
+} from '@/lib/notifications';
 import Icon from '@/components/ui/AppIcon';
 
 
 interface AppLayoutProps {
   children: React.ReactNode;
   hideHeader?: boolean;
+}
+
+interface UserData {
+  username?: string;
+  communityName?: string;
+  usernamePublic?: boolean;
+  notifGranted?: boolean;
+  dailyReminder?: boolean;
+  exerciseReminder?: boolean;
+  dailyReminderTime?: string;
+  exerciseReminderTime?: string;
 }
 
 const navItems = [
@@ -21,46 +38,100 @@ const navItems = [
   { label: 'Motivation', path: '/daily-motivation', Icon: Star },
 ];
 
+const LS_USER_KEY = 'mindbloom_user';
+
+function readUserData(): UserData {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(LS_USER_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeUserData(updates: Partial<UserData>) {
+  try {
+    const existing = readUserData();
+    localStorage.setItem(LS_USER_KEY, JSON.stringify({ ...existing, ...updates }));
+  } catch {}
+}
+
 export default function AppLayout({ children, hideHeader = false }: AppLayoutProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [username, setUsername] = useState('');
-  const [communityName, setCommunityName] = useState('');
   const [notifGranted, setNotifGranted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'profile' | 'notifications' | 'privacy' | 'about'>('profile');
+
+  // Profile state
+  const [username, setUsername] = useState('');
+  const [communityName, setCommunityName] = useState('');
   const [usernamePublic, setUsernamePublic] = useState(true);
   const [editUsername, setEditUsername] = useState('');
   const [editCommunity, setEditCommunity] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [dailyReminder, setDailyReminder] = useState(true);
-  const [exerciseReminder, setExerciseReminder] = useState(true);
-  const [reminderTime, setReminderTime] = useState('08:00');
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [activeSettingsTab, setActiveSettingsTab] = useState<'profile' | 'notifications' | 'privacy' | 'about'>('profile');
+
+  // Notification state
+  const [dailyReminder, setDailyReminder] = useState(false);
+  const [exerciseReminder, setExerciseReminder] = useState(false);
+  const [dailyReminderTime, setDailyReminderTime] = useState('');
+  const [exerciseReminderTime, setExerciseReminderTime] = useState('');
+  const [showDailyTimePicker, setShowDailyTimePicker] = useState(false);
+  const [showExerciseTimePicker, setShowExerciseTimePicker] = useState(false);
+  const [tempDailyTime, setTempDailyTime] = useState('08:00');
+  const [tempExerciseTime, setTempExerciseTime] = useState('18:00');
+
   const pathname = usePathname();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const isHomePage = pathname === '/home-dashboard';
 
+  // Single batched localStorage read on mount
   useEffect(() => {
-    const stored = localStorage.getItem('mindbloom_user');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setUsername(parsed.username || '');
-        setCommunityName(parsed.communityName || '');
-        setUsernamePublic(parsed.usernamePublic !== false);
-        setEditUsername(parsed.username || '');
-        setEditCommunity(parsed.communityName || '');
-        setDailyReminder(parsed.dailyReminder !== false);
-        setExerciseReminder(parsed.exerciseReminder !== false);
-        setReminderTime(parsed.reminderTime || '08:00');
-      } catch {}
-    }
-    if (typeof Notification !== 'undefined') {
-      setNotifGranted(Notification.permission === 'granted');
-    }
+    const data = readUserData();
+    setUsername(data.username || '');
+    setCommunityName(data.communityName || '');
+    setUsernamePublic(data.usernamePublic !== false);
+    setEditUsername(data.username || '');
+    setEditCommunity(data.communityName || '');
+    setDailyReminder(!!data.dailyReminder);
+    setExerciseReminder(!!data.exerciseReminder);
+    setDailyReminderTime(data.dailyReminderTime || '');
+    setExerciseReminderTime(data.exerciseReminderTime || '');
+    setNotifGranted(getNotificationPermission() === 'granted');
+
+    // Register SW on mount
+    registerServiceWorker();
+  }, []);
+
+  // Re-read user data when settings opens
+  useEffect(() => {
+    if (!showSettings) return;
+    const data = readUserData();
+    setUsername(data.username || '');
+    setCommunityName(data.communityName || '');
+    setUsernamePublic(data.usernamePublic !== false);
+    setEditUsername(data.username || '');
+    setEditCommunity(data.communityName || '');
+    setDailyReminder(!!data.dailyReminder);
+    setExerciseReminder(!!data.exerciseReminder);
+    setDailyReminderTime(data.dailyReminderTime || '');
+    setExerciseReminderTime(data.exerciseReminderTime || '');
+    setNotifGranted(getNotificationPermission() === 'granted');
   }, [showSettings]);
+
+  // Schedule reminders whenever relevant state changes
+  useEffect(() => {
+    if (!notifGranted) return;
+    if (dailyReminder && dailyReminderTime) {
+      scheduleReminder('daily-checkin', 'MindBloom 🌸', 'Time for your daily mood check-in!', dailyReminderTime);
+    }
+    if (exerciseReminder && exerciseReminderTime) {
+      scheduleReminder('exercise-reminder', 'MindBloom 💪', 'Time for your self-care exercise!', exerciseReminderTime);
+    }
+  }, [notifGranted, dailyReminder, dailyReminderTime, exerciseReminder, exerciseReminderTime]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -72,44 +143,66 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showMenu]);
 
-  const saveUserData = (updates: Record<string, unknown>) => {
-    try {
-      const stored = localStorage.getItem('mindbloom_user');
-      const parsed = stored ? JSON.parse(stored) : {};
-      localStorage.setItem('mindbloom_user', JSON.stringify({ ...parsed, ...updates }));
-    } catch {}
-  };
-
-  const toggleUsernameVisibility = () => {
+  const toggleUsernameVisibility = useCallback(() => {
     const newVal = !usernamePublic;
     setUsernamePublic(newVal);
-    saveUserData({ usernamePublic: newVal });
-  };
+    writeUserData({ usernamePublic: newVal });
+  }, [usernamePublic]);
 
-  const saveProfile = () => {
+  const saveProfile = useCallback(() => {
     setUsername(editUsername);
     setCommunityName(editCommunity);
-    saveUserData({ username: editUsername, communityName: editCommunity });
+    writeUserData({ username: editUsername, communityName: editCommunity });
     setIsEditing(false);
-  };
+  }, [editUsername, editCommunity]);
 
-  const saveNotifSettings = (key: string, value: boolean | string) => {
-    if (key === 'dailyReminder') setDailyReminder(value as boolean);
-    if (key === 'exerciseReminder') setExerciseReminder(value as boolean);
-    if (key === 'reminderTime') setReminderTime(value as string);
-    saveUserData({ [key]: value });
-  };
-
-  const requestNotifications = async () => {
-    if (typeof Notification === 'undefined') return;
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
+  const handleEnableNotifications = useCallback(async () => {
+    const granted = await requestNotificationPermission();
+    if (granted) {
       setNotifGranted(true);
-      saveUserData({ notifGranted: true });
+      writeUserData({ notifGranted: true });
     }
-  };
+  }, []);
 
-  const clearAllData = () => {
+  const handleDailyReminderToggle = useCallback(() => {
+    if (!dailyReminder) {
+      // Turning ON — show time picker
+      setShowDailyTimePicker(true);
+    } else {
+      // Turning OFF
+      setDailyReminder(false);
+      setDailyReminderTime('');
+      setShowDailyTimePicker(false);
+      writeUserData({ dailyReminder: false, dailyReminderTime: '' });
+    }
+  }, [dailyReminder]);
+
+  const saveDailyReminderTime = useCallback(() => {
+    setDailyReminder(true);
+    setDailyReminderTime(tempDailyTime);
+    setShowDailyTimePicker(false);
+    writeUserData({ dailyReminder: true, dailyReminderTime: tempDailyTime });
+  }, [tempDailyTime]);
+
+  const handleExerciseReminderToggle = useCallback(() => {
+    if (!exerciseReminder) {
+      setShowExerciseTimePicker(true);
+    } else {
+      setExerciseReminder(false);
+      setExerciseReminderTime('');
+      setShowExerciseTimePicker(false);
+      writeUserData({ exerciseReminder: false, exerciseReminderTime: '' });
+    }
+  }, [exerciseReminder]);
+
+  const saveExerciseReminderTime = useCallback(() => {
+    setExerciseReminder(true);
+    setExerciseReminderTime(tempExerciseTime);
+    setShowExerciseTimePicker(false);
+    writeUserData({ exerciseReminder: true, exerciseReminderTime: tempExerciseTime });
+  }, [tempExerciseTime]);
+
+  const clearAllData = useCallback(() => {
     const keys = ['mindbloom_user', 'mindbloom_streak', 'mindbloom_notes', 'mindbloom_mood_entries',
       'wellness-tips-checked', 'wellness-tips-date', 'mindbloom_exercise_counts',
       'mindbloom_test_results', 'mindbloom_sound_prefs'];
@@ -117,12 +210,12 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
     setShowClearConfirm(false);
     setShowSettings(false);
     window.location.reload();
-  };
+  }, []);
 
-  const handleNavClick = (path: string) => {
+  const handleNavClick = useCallback((path: string) => {
     setShowMenu(false);
     router.push(path);
-  };
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -134,16 +227,13 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               <span className="font-nunito font-800 text-lg text-purple-800 tracking-tight hidden sm:block">MindBloom</span>
             </div>
 
-            {/* Center: current page label */}
             <div className="flex-1 flex justify-center">
               <span className="font-nunito font-700 text-sm text-purple-700">
                 {navItems.find(n => n.path === pathname)?.label ?? 'MindBloom'}
               </span>
             </div>
 
-            {/* Right actions */}
             <div className="flex items-center gap-1.5 flex-shrink-0">
-              {/* Hamburger menu button */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowMenu(v => !v)}
@@ -153,12 +243,11 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 <Menu size={18} />
               </motion.button>
 
-              {/* Settings & Notifications — only on homepage */}
               {isHomePage && (
                 <>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => { requestNotifications(); }}
+                    onClick={handleEnableNotifications}
                     className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-2xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center transition-colors"
                     aria-label="Notifications"
                   >
@@ -177,7 +266,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
             </div>
           </div>
 
-          {/* Slide-down menu: nav links only (Settings & Notifications moved to header) */}
           <AnimatePresence>
             {showMenu && (
               <motion.div
@@ -188,7 +276,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 className="overflow-hidden border-t border-purple-100/60 bg-white/95 backdrop-blur-xl"
               >
                 <nav className="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col gap-1">
-                  {/* Nav links */}
                   {navItems.map((item) => {
                     const isActive = pathname === item.path;
                     const { Icon } = item;
@@ -219,7 +306,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
         {children}
       </main>
 
-      {/* Enhanced Settings Panel */}
+      {/* Settings Panel */}
       <AnimatePresence>
         {showSettings && (
           <motion.div
@@ -236,7 +323,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="bg-white/95 backdrop-blur-xl rounded-4xl w-full max-w-sm border border-purple-100 shadow-2xl max-h-[90vh] flex flex-col"
             >
-              {/* Header */}
               <div className="flex items-center justify-between p-5 pb-3 flex-shrink-0">
                 <h2 className="font-nunito font-800 text-lg text-purple-900">Settings</h2>
                 <button
@@ -247,7 +333,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 </button>
               </div>
 
-              {/* Tab bar */}
               <div className="flex gap-1 px-5 pb-3 flex-shrink-0">
                 {(['profile', 'notifications', 'privacy', 'about'] as const).map(tab => (
                   <button
@@ -264,7 +349,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 ))}
               </div>
 
-              {/* Tab content */}
               <div className="overflow-y-auto flex-1 px-5 pb-5">
 
                 {/* PROFILE TAB */}
@@ -325,7 +409,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                       )}
                     </div>
 
-                    {/* Visibility toggle */}
                     <div className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden">
                       <button
                         onClick={toggleUsernameVisibility}
@@ -355,9 +438,10 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 {/* NOTIFICATIONS TAB */}
                 {activeSettingsTab === 'notifications' && (
                   <div className="space-y-3">
+                    {/* Browser Notifications toggle */}
                     <div className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden">
                       <button
-                        onClick={requestNotifications}
+                        onClick={handleEnableNotifications}
                         className="w-full flex items-center gap-3 p-4 hover:bg-purple-50/50 transition-colors min-h-[44px]"
                       >
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${notifGranted ? 'bg-green-100' : 'bg-pink-50'}`}>
@@ -367,46 +451,178 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                           <p className="font-nunito font-700 text-sm text-purple-900">Browser Notifications</p>
                           <p className="text-xs font-dm text-purple-400">{notifGranted ? 'Enabled ✓' : 'Tap to enable'}</p>
                         </div>
-                        <ChevronRight size={16} className="text-purple-300" />
+                        <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${notifGranted ? 'bg-green-400' : 'bg-gray-200'}`}>
+                          <motion.div
+                            animate={{ x: notifGranted ? 20 : 2 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                            className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
+                          />
+                        </div>
                       </button>
                     </div>
 
-                    {[
-                      { key: 'dailyReminder', label: 'Daily Check-in Reminder', desc: 'Remind me to log my mood daily', value: dailyReminder, setter: (v: boolean) => saveNotifSettings('dailyReminder', v) },
-                      { key: 'exerciseReminder', label: 'Exercise Reminder', desc: 'Remind me to do self-care exercises', value: exerciseReminder, setter: (v: boolean) => saveNotifSettings('exerciseReminder', v) },
-                    ].map(item => (
-                      <div key={item.key} className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden">
+                    {/* Reminder toggles — only visible when notifications are granted */}
+                    {!notifGranted ? (
+                      <div className="bg-amber-50 border border-amber-100 rounded-3xl p-4 text-center">
+                        <p className="text-2xl mb-2">🔔</p>
+                        <p className="font-nunito font-700 text-sm text-amber-800 mb-1">Enable Notifications First</p>
+                        <p className="text-xs font-dm text-amber-600">Allow browser notifications to set up daily check-in and exercise reminders.</p>
                         <button
-                          onClick={() => item.setter(!item.value)}
-                          className="w-full flex items-center gap-3 p-4 hover:bg-purple-50/50 transition-colors min-h-[44px]"
+                          onClick={handleEnableNotifications}
+                          className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-400 text-white font-nunito font-700 text-sm shadow-md min-h-[44px]"
                         >
-                          <div className="flex-1 text-left">
-                            <p className="font-nunito font-700 text-sm text-purple-900">{item.label}</p>
-                            <p className="text-xs font-dm text-purple-400">{item.desc}</p>
-                          </div>
-                          <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${item.value ? 'bg-purple-400' : 'bg-gray-200'}`}>
-                            <motion.div
-                              animate={{ x: item.value ? 20 : 2 }}
-                              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                              className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
-                            />
-                          </div>
+                          Enable Browser Notifications
                         </button>
                       </div>
-                    ))}
+                    ) : (
+                      <>
+                        {/* Daily Check-in Reminder */}
+                        <div className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden">
+                          <button
+                            onClick={handleDailyReminderToggle}
+                            className="w-full flex items-center gap-3 p-4 hover:bg-purple-50/50 transition-colors min-h-[44px]"
+                          >
+                            <div className="flex-1 text-left">
+                              <p className="font-nunito font-700 text-sm text-purple-900">Daily Check-in Reminder</p>
+                              <p className="text-xs font-dm text-purple-400">Remind me to log my mood daily</p>
+                            </div>
+                            <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${dailyReminder ? 'bg-purple-400' : 'bg-gray-200'}`}>
+                              <motion.div
+                                animate={{ x: dailyReminder ? 20 : 2 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
+                              />
+                            </div>
+                          </button>
 
-                    <div className="bg-white/70 rounded-3xl border border-purple-100/60 p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock size={15} className="text-purple-400" />
-                        <p className="font-nunito font-700 text-sm text-purple-900">Reminder Time</p>
-                      </div>
-                      <input
-                        type="time"
-                        value={reminderTime}
-                        onChange={e => saveNotifSettings('reminderTime', e.target.value)}
-                        className="w-full bg-purple-50 rounded-2xl px-3 py-2.5 text-sm font-dm text-purple-900 border border-purple-100 outline-none focus:ring-2 focus:ring-purple-200"
-                      />
-                    </div>
+                          {/* Time picker — shown when toggling ON or when changing time */}
+                          <AnimatePresence>
+                            {showDailyTimePicker && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden border-t border-purple-50"
+                              >
+                                <div className="px-4 pb-4 pt-3 space-y-2">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Clock size={13} className="text-purple-400" />
+                                    <p className="text-xs font-dm text-purple-600">Set reminder time</p>
+                                  </div>
+                                  <input
+                                    type="time"
+                                    value={tempDailyTime}
+                                    onChange={e => setTempDailyTime(e.target.value)}
+                                    className="w-full bg-purple-50 rounded-2xl px-3 py-2.5 text-sm font-dm text-purple-900 border border-purple-100 outline-none focus:ring-2 focus:ring-purple-200"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => setShowDailyTimePicker(false)}
+                                      className="flex-1 py-2 rounded-2xl bg-gray-100 text-gray-600 font-nunito font-700 text-xs min-h-[36px]"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      onClick={saveDailyReminderTime}
+                                      className="flex-1 py-2 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-400 text-white font-nunito font-700 text-xs shadow-sm min-h-[36px]"
+                                    >
+                                      Save Time
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {/* Show set time with Change Time option */}
+                          {dailyReminder && dailyReminderTime && !showDailyTimePicker && (
+                            <div className="px-4 pb-3 flex items-center gap-2 border-t border-purple-50 pt-2">
+                              <Clock size={13} className="text-purple-400" />
+                              <p className="text-xs font-dm text-purple-600 flex-1">Reminder at <span className="font-700 text-purple-800">{dailyReminderTime}</span></p>
+                              <button
+                                onClick={() => { setTempDailyTime(dailyReminderTime); setShowDailyTimePicker(true); }}
+                                className="text-[11px] font-nunito font-700 text-purple-500 hover:text-purple-700 underline underline-offset-2"
+                              >
+                                Change Time
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Exercise Reminder */}
+                        <div className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden">
+                          <button
+                            onClick={handleExerciseReminderToggle}
+                            className="w-full flex items-center gap-3 p-4 hover:bg-purple-50/50 transition-colors min-h-[44px]"
+                          >
+                            <div className="flex-1 text-left">
+                              <p className="font-nunito font-700 text-sm text-purple-900">Exercise Reminder</p>
+                              <p className="text-xs font-dm text-purple-400">Remind me to do self-care exercises</p>
+                            </div>
+                            <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${exerciseReminder ? 'bg-purple-400' : 'bg-gray-200'}`}>
+                              <motion.div
+                                animate={{ x: exerciseReminder ? 20 : 2 }}
+                                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                                className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
+                              />
+                            </div>
+                          </button>
+
+                          <AnimatePresence>
+                            {showExerciseTimePicker && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden border-t border-purple-50"
+                              >
+                                <div className="px-4 pb-4 pt-3 space-y-2">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Clock size={13} className="text-purple-400" />
+                                    <p className="text-xs font-dm text-purple-600">Set reminder time</p>
+                                  </div>
+                                  <input
+                                    type="time"
+                                    value={tempExerciseTime}
+                                    onChange={e => setTempExerciseTime(e.target.value)}
+                                    className="w-full bg-purple-50 rounded-2xl px-3 py-2.5 text-sm font-dm text-purple-900 border border-purple-100 outline-none focus:ring-2 focus:ring-purple-200"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => setShowExerciseTimePicker(false)}
+                                      className="flex-1 py-2 rounded-2xl bg-gray-100 text-gray-600 font-nunito font-700 text-xs min-h-[36px]"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      onClick={saveExerciseReminderTime}
+                                      className="flex-1 py-2 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-400 text-white font-nunito font-700 text-xs shadow-sm min-h-[36px]"
+                                    >
+                                      Save Time
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          {exerciseReminder && exerciseReminderTime && !showExerciseTimePicker && (
+                            <div className="px-4 pb-3 flex items-center gap-2 border-t border-purple-50 pt-2">
+                              <Clock size={13} className="text-purple-400" />
+                              <p className="text-xs font-dm text-purple-600 flex-1">Reminder at <span className="font-700 text-purple-800">{exerciseReminderTime}</span></p>
+                              <button
+                                onClick={() => { setTempExerciseTime(exerciseReminderTime); setShowExerciseTimePicker(true); }}
+                                className="text-[11px] font-nunito font-700 text-purple-500 hover:text-purple-700 underline underline-offset-2"
+                              >
+                                Change Time
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
