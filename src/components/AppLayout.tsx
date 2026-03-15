@@ -1,15 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import BottomNav from './BottomNav';
 import AppLogo from '@/components/ui/AppLogo';
-import { Bell, Settings, X, User, Users, FileText, ChevronRight } from 'lucide-react';
+import { Bell, Settings, X, User, Users, FileText, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface AppLayoutProps {
   children: React.ReactNode;
   hideHeader?: boolean;
 }
+
+const navItems = [
+  { label: 'Home', path: '/home-dashboard', emoji: '🏠' },
+  { label: 'Community', path: '/community-section', emoji: '🤝' },
+  { label: 'Diary', path: '/mood-tracker-diary', emoji: '📔' },
+  { label: 'Tests', path: '/psychology-tests', emoji: '🧠' },
+  { label: 'Motivation', path: '/daily-motivation', emoji: '✨' },
+];
 
 export default function AppLayout({ children, hideHeader = false }: AppLayoutProps) {
   const [showSettings, setShowSettings] = useState(false);
@@ -17,6 +25,9 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
   const [communityName, setCommunityName] = useState('');
   const [notifGranted, setNotifGranted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [usernamePublic, setUsernamePublic] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const stored = localStorage.getItem('mindbloom_user');
@@ -25,6 +36,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
         const parsed = JSON.parse(stored);
         setUsername(parsed.username || '');
         setCommunityName(parsed.communityName || '');
+        setUsernamePublic(parsed.usernamePublic !== false);
       } catch {}
     }
     if (typeof Notification !== 'undefined') {
@@ -32,12 +44,23 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
     }
   }, [showSettings]);
 
+  const toggleUsernameVisibility = () => {
+    const newVal = !usernamePublic;
+    setUsernamePublic(newVal);
+    const stored = localStorage.getItem('mindbloom_user');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        localStorage.setItem('mindbloom_user', JSON.stringify({ ...parsed, usernamePublic: newVal }));
+      } catch {}
+    }
+  };
+
   const requestNotifications = async () => {
     if (typeof Notification === 'undefined') return;
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       setNotifGranted(true);
-      // Schedule daily check-in reminder
       const scheduleNotif = (title: string, body: string, delayMs: number) => {
         setTimeout(() => {
           new Notification(title, { body, icon: '/favicon.ico' });
@@ -49,34 +72,57 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 pb-28">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
       {!hideHeader && (
-        <header className="fixed top-0 left-0 right-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/60 px-4 py-3">
-          <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AppLogo size={32} />
-              <span className="font-nunito font-800 text-xl text-purple-800 tracking-tight">MindBloom</span>
+        <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
+          <div className="max-w-screen-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <AppLogo size={28} />
+              <span className="font-nunito font-800 text-lg text-purple-800 tracking-tight hidden sm:block">MindBloom</span>
             </div>
-            <div className="flex items-center gap-2">
-              {/* Notification button */}
+
+            {/* Top Navigation Links */}
+            <nav className="flex items-center gap-1 flex-1 justify-center">
+              {navItems.map((item) => {
+                const isActive = pathname === item.path;
+                return (
+                  <motion.button
+                    key={item.path}
+                    onClick={() => router.push(item.path)}
+                    whileTap={{ scale: 0.93 }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-sm font-nunito font-600 transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 shadow-sm'
+                        : 'text-purple-400 hover:text-purple-600 hover:bg-purple-50'
+                    }`}
+                  >
+                    <span className="text-base">{item.emoji}</span>
+                    <span className="hidden md:block">{item.label}</span>
+                  </motion.button>
+                );
+              })}
+            </nav>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={requestNotifications}
                 title={notifGranted ? 'Notifications enabled' : 'Enable daily reminders'}
                 className={`w-9 h-9 rounded-2xl flex items-center justify-center transition-colors relative ${notifGranted ? 'bg-pink-100 text-pink-500' : 'bg-pink-50 hover:bg-pink-100 text-pink-400'}`}
               >
-                <Bell size={18} />
+                <Bell size={17} />
                 {notifGranted && (
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-green-400" />
                 )}
               </motion.button>
-              {/* Settings button */}
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowSettings(true)}
                 className="w-9 h-9 rounded-2xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-500 transition-colors"
               >
-                <Settings size={18} />
+                <Settings size={17} />
               </motion.button>
             </div>
           </div>
@@ -86,7 +132,6 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
       <main className="max-w-screen-2xl mx-auto px-4 py-4 xl:px-8 2xl:px-12 pt-20">
         {children}
       </main>
-      <BottomNav />
 
       {/* Settings Panel */}
       <AnimatePresence>
@@ -106,7 +151,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               className="bg-white/95 backdrop-blur-xl rounded-4xl p-6 w-full max-w-sm border border-purple-100 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-nunito font-800 text-lg text-purple-900">Profile & Settings ✦</h2>
+                <h2 className="font-nunito font-800 text-lg text-purple-900">Profile & Settings 🌸</h2>
                 <button
                   onClick={() => setShowSettings(false)}
                   className="w-8 h-8 rounded-xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-500 transition-colors"
@@ -122,7 +167,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                     🌸
                   </div>
                   <div>
-                    <p className="font-nunito font-800 text-base text-purple-900">{username || 'Anonymous'}</p>
+                    <p className="font-nunito font-800 text-base text-purple-900">{communityName || 'Anonymous'}</p>
                     <p className="text-xs font-dm text-purple-500">MindBloom Member</p>
                   </div>
                 </div>
@@ -131,17 +176,44 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                     <User size={14} className="text-purple-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-dm text-purple-400 uppercase tracking-wide">Username</p>
-                      <p className="text-sm font-nunito font-700 text-purple-800 truncate">{username || 'Not set'}</p>
+                      <p className="text-sm font-nunito font-700 text-purple-800 truncate">
+                        {username ? `@${username}` : 'Not set'}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 bg-white/60 rounded-2xl px-3 py-2 border border-white/60">
                     <Users size={14} className="text-purple-400 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-dm text-purple-400 uppercase tracking-wide">Community</p>
+                      <p className="text-[10px] font-dm text-purple-400 uppercase tracking-wide">Community Name</p>
                       <p className="text-sm font-nunito font-700 text-purple-800 truncate">{communityName || 'Not set'}</p>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Username Visibility Toggle */}
+              <div className="bg-white/70 rounded-3xl border border-purple-100/60 overflow-hidden mb-4">
+                <button
+                  onClick={toggleUsernameVisibility}
+                  className="w-full flex items-center gap-3 p-4 hover:bg-purple-50/50 transition-colors"
+                >
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${usernamePublic ? 'bg-purple-100' : 'bg-gray-100'}`}>
+                    {usernamePublic ? <Eye size={16} className="text-purple-600" /> : <EyeOff size={16} className="text-gray-400" />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-nunito font-700 text-sm text-purple-900">Username Visibility</p>
+                    <p className="text-xs font-dm text-purple-400">
+                      {usernamePublic ? 'Public — visible in community' : 'Hidden — shown as Anonymous'}
+                    </p>
+                  </div>
+                  <div className={`w-11 h-6 rounded-full transition-all duration-300 relative ${usernamePublic ? 'bg-purple-400' : 'bg-gray-200'}`}>
+                    <motion.div
+                      animate={{ x: usernamePublic ? 20 : 2 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                      className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-sm"
+                    />
+                  </div>
+                </button>
               </div>
 
               {/* Notifications */}

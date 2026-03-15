@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { Save, Sparkles, X } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 
 const prompts = [
   "What made you smile today, even just a little?",
@@ -83,9 +83,9 @@ export default function DiaryEditor({ onClose }: DiaryEditorProps) {
           </p>
           <button
             onClick={nextPrompt}
-            className="flex-shrink-0 w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center text-purple-600 transition-colors"
+            className="flex-shrink-0 w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 flex items-center justify-center text-purple-600 transition-colors text-sm"
           >
-            <Sparkles size={12} />
+            ✨
           </button>
         </div>
       </motion.div>

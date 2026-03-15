@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MessageCircle, Share2, Send, X, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
@@ -151,7 +151,23 @@ export default function CommunityFeed() {
   const [isPosting, setIsPosting] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [newComment, setNewComment] = useState<Record<number, string>>({});
-  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(true);
+  const [disclaimerLoaded, setDisclaimerLoaded] = useState(false);
+
+  useEffect(() => {
+    const accepted = localStorage.getItem('mindbloom_community_disclaimer');
+    if (accepted === 'true') {
+      setDisclaimerAccepted(true);
+    } else {
+      setDisclaimerAccepted(false);
+    }
+    setDisclaimerLoaded(true);
+  }, []);
+
+  const acceptDisclaimer = () => {
+    localStorage.setItem('mindbloom_community_disclaimer', 'true');
+    setDisclaimerAccepted(true);
+  };
 
   const toggleLike = (id: number) => {
     setPosts(prev => prev.map(p =>
@@ -162,12 +178,22 @@ export default function CommunityFeed() {
   const submitPost = () => {
     if (!newPost.trim()) return;
     setIsPosting(true);
+    const stored = localStorage.getItem('mindbloom_user');
+    let handle = '@mindbloom_user';
+    let displayName = 'You';
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (parsed.username) handle = `@${parsed.username}`;
+        if (parsed.communityName) displayName = parsed.communityName;
+      } catch {}
+    }
     setTimeout(() => {
       const post = {
         id: Date.now(),
         avatar: '🌸',
-        name: 'You',
-        handle: '@mindbloom_user',
+        name: displayName,
+        handle,
         time: 'Just now',
         gradient: 'gradient-lavender',
         tag: 'Sharing',
@@ -204,43 +230,39 @@ export default function CommunityFeed() {
     toast.success('Comment added! 💬');
   };
 
+  if (!disclaimerLoaded) return null;
+
   return (
     <div className="space-y-4">
-      {/* Disclaimer card — must accept before seeing posts */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`rounded-3xl border p-5 ${disclaimerAccepted ? 'bg-green-50 border-green-100' : 'bg-amber-50 border-amber-200'}`}
-      >
-        <div className="flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">{disclaimerAccepted ? '✅' : '⚠️'}</span>
-          <div className="flex-1">
-            <p className="font-nunito font-700 text-sm text-amber-900 mb-1">
-              {disclaimerAccepted ? 'Community Guidelines Accepted' : 'Community Disclaimer'}
-            </p>
-            {!disclaimerAccepted ? (
-              <>
-                <p className="text-xs font-dm text-amber-800 leading-relaxed mb-3">
-                  This is a peer-support community, <strong>not a substitute for professional mental health care</strong>. Content shared here reflects personal experiences and opinions only. If you are in crisis or experiencing a mental health emergency, please contact a qualified professional or helpline immediately.
-                </p>
-                <p className="text-xs font-dm text-amber-700 leading-relaxed mb-4">
-                  By continuing, you agree to be kind, supportive, and respectful. No harmful, abusive, or triggering content is permitted. MindBloom reserves the right to remove content that violates community guidelines.
-                </p>
-                <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setDisclaimerAccepted(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-nunito font-700 text-sm bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-md"
-                >
-                  <ShieldCheck size={15} />
-                  I Understand & Agree
-                </motion.button>
-              </>
-            ) : (
-              <p className="text-xs font-dm text-green-700">You've agreed to our community guidelines. Be kind and supportive 💚</p>
-            )}
+      {/* Disclaimer card — shown only on first visit */}
+      {!disclaimerAccepted && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-3xl border p-5 bg-amber-50 border-amber-200"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">⚠️</span>
+            <div className="flex-1">
+              <p className="font-nunito font-700 text-sm text-amber-900 mb-1">Community Disclaimer</p>
+              <p className="text-xs font-dm text-amber-800 leading-relaxed mb-3">
+                This is a peer-support community, <strong>not a substitute for professional mental health care</strong>. Content shared here reflects personal experiences and opinions only. If you are in crisis or experiencing a mental health emergency, please contact a qualified professional or helpline immediately.
+              </p>
+              <p className="text-xs font-dm text-amber-700 leading-relaxed mb-4">
+                By continuing, you agree to be kind, supportive, and respectful. No harmful, abusive, or triggering content is permitted. MindBloom reserves the right to remove content that violates community guidelines.
+              </p>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={acceptDisclaimer}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-nunito font-700 text-sm bg-gradient-to-r from-amber-400 to-orange-400 text-white shadow-md"
+              >
+                <ShieldCheck size={15} />
+                I Understand & Agree
+              </motion.button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Community content — only visible after disclaimer accepted */}
       <AnimatePresence>

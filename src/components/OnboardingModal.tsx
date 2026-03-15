@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,6 +9,7 @@ export default function OnboardingModal() {
   const [username, setUsername] = useState('');
   const [communityName, setCommunityName] = useState('');
   const [step, setStep] = useState(1);
+  const [usernameError, setUsernameError] = useState('');
 
   useEffect(() => {
     const stored = localStorage.getItem('mindbloom_user');
@@ -16,14 +18,37 @@ export default function OnboardingModal() {
     }
   }, []);
 
+  const validateUsername = (val: string): string => {
+    if (!val) return '';
+    if (val.length < 3) return 'Must be at least 3 characters';
+    if (val.length > 20) return 'Must be 20 characters or less';
+    if (!/^[a-zA-Z0-9_]+$/.test(val)) return 'Only letters, numbers, and underscores allowed';
+    return '';
+  };
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\s/g, '');
+    setUsername(raw);
+    setUsernameError(validateUsername(raw));
+  };
+
   const handleContinue = () => {
-    if (step === 1 && username?.trim()) {
+    if (step === 1) {
+      const err = validateUsername(username.trim());
+      if (err) { setUsernameError(err); return; }
+      if (!username.trim()) return;
       setStep(2);
     } else if (step === 2 && communityName?.trim()) {
-      localStorage.setItem('mindbloom_user', JSON.stringify({ username: username?.trim(), communityName: communityName?.trim() }));
+      localStorage.setItem('mindbloom_user', JSON.stringify({
+        username: username.trim(),
+        communityName: communityName.trim(),
+        usernamePublic: true,
+      }));
       setShow(false);
     }
   };
+
+  const isStep1Valid = username.trim().length >= 3 && !usernameError;
 
   return (
     <AnimatePresence>
@@ -68,17 +93,33 @@ export default function OnboardingModal() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                 >
-                  <p className="font-nunito font-700 text-base text-purple-800 mb-1">What should we call you?</p>
-                  <p className="text-xs font-dm text-purple-400 mb-4">This is how you'll appear in the community 💜</p>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e?.target?.value)}
-                    onKeyDown={(e) => { if (e?.key === 'Enter') handleContinue(); }}
-                    placeholder="Your name or nickname..."
-                    className="w-full bg-purple-50 rounded-2xl px-4 py-3 text-sm font-dm text-purple-900 placeholder-purple-300 border border-purple-100 outline-none focus:ring-2 focus:ring-purple-200 transition-all"
-                    autoFocus
-                  />
+                  <p className="font-nunito font-700 text-base text-purple-800 mb-1">What's your real name?</p>
+                  <p className="text-xs font-dm text-purple-400 mb-4">
+                    This becomes your <span className="font-semibold text-purple-600">@username</span> — letters, numbers & underscores only (3–20 chars) 💜
+                  </p>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-dm text-purple-400 font-semibold">@</span>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      onKeyDown={(e) => { if (e?.key === 'Enter') handleContinue(); }}
+                      placeholder="yourname"
+                      maxLength={20}
+                      className={`w-full bg-purple-50 rounded-2xl pl-8 pr-4 py-3 text-sm font-dm text-purple-900 placeholder-purple-300 border outline-none focus:ring-2 transition-all ${
+                        usernameError ? 'border-red-300 focus:ring-red-200' : 'border-purple-100 focus:ring-purple-200'
+                      }`}
+                      autoFocus
+                    />
+                  </div>
+                  {usernameError && (
+                    <p className="text-xs text-red-500 mt-1.5 font-dm">{usernameError}</p>
+                  )}
+                  {username && !usernameError && (
+                    <p className="text-xs text-purple-500 mt-1.5 font-dm">
+                      Your handle: <span className="font-semibold text-purple-700">@{username}</span>
+                    </p>
+                  )}
                 </motion.div>
               )}
               {step === 2 && (
@@ -88,8 +129,8 @@ export default function OnboardingModal() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                 >
-                  <p className="font-nunito font-700 text-base text-purple-800 mb-1">Join a community</p>
-                  <p className="text-xs font-dm text-purple-400 mb-4">Name your community or group (e.g. "Mindful Mornings") 🌱</p>
+                  <p className="font-nunito font-700 text-base text-purple-800 mb-1">Name your community 🌱</p>
+                  <p className="text-xs font-dm text-purple-400 mb-4">This is your community display name — be creative! (e.g. "Mindful Mornings")</p>
                   <input
                     type="text"
                     value={communityName}
@@ -106,7 +147,7 @@ export default function OnboardingModal() {
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={handleContinue}
-              disabled={step === 1 ? !username?.trim() : !communityName?.trim()}
+              disabled={step === 1 ? !isStep1Valid : !communityName?.trim()}
               className="w-full mt-5 py-3 rounded-2xl font-nunito font-700 text-sm bg-gradient-to-r from-purple-400 to-pink-400 text-white shadow-md disabled:opacity-40 transition-all"
             >
               {step === 1 ? 'Continue →' : 'Enter MindBloom 🌸'}
