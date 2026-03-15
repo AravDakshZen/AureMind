@@ -27,7 +27,7 @@ export default function MoodInput() {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white/70 backdrop-blur-sm rounded-4xl p-5 border border-white/60 shadow-md"
     >
-      <h2 className="font-nunito font-700 text-base text-purple-900 mb-4">How are you feeling? 🌈</h2>
+      <h2 className="font-nunito font-700 text-base text-purple-900 mb-4">How are you feeling?</h2>
       {/* Emoji display */}
       <div className="flex flex-col items-center mb-5">
         <motion.div
@@ -49,14 +49,8 @@ export default function MoodInput() {
         </motion.p>
         <p className="font-dm text-purple-400 text-sm">{mood}/10</p>
       </div>
-      {/* Slider */}
+      {/* Single functional mood slider */}
       <div className="mb-2">
-        <div
-          className="w-full h-2 rounded-full mb-2"
-          style={{
-            background: `linear-gradient(to right, #A2D2FF 0%, #CDB4DB 40%, #FFC8DD 70%, #b7ebd8 100%)`
-          }}
-        />
         <input
           type="range"
           min={1}
@@ -69,8 +63,8 @@ export default function MoodInput() {
           }}
         />
         <div className="flex justify-between text-xs font-dm text-purple-300 mt-1">
-          <span>😔 Low</span>
-          <span>😊 High</span>
+          <span>Low</span>
+          <span>High</span>
         </div>
       </div>
     </motion.div>

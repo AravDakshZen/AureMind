@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AppLogo from '@/components/ui/AppLogo';
-import { Bell, Settings, X, User, Users, FileText, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Bell, Settings, X, User, Users, FileText, ChevronRight, Eye, EyeOff, Menu, Home, Users2, BookOpen, Brain, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
+import Icon from '@/components/ui/AppIcon';
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,15 +14,16 @@ interface AppLayoutProps {
 }
 
 const navItems = [
-  { label: 'Home', path: '/home-dashboard', emoji: '🏠' },
-  { label: 'Community', path: '/community-section', emoji: '🤝' },
-  { label: 'Diary', path: '/mood-tracker-diary', emoji: '📔' },
-  { label: 'Tests', path: '/psychology-tests', emoji: '🧠' },
-  { label: 'Motivation', path: '/daily-motivation', emoji: '✨' },
+  { label: 'Home', path: '/home-dashboard', Icon: Home },
+  { label: 'Community', path: '/community-section', Icon: Users2 },
+  { label: 'Diary', path: '/mood-tracker-diary', Icon: BookOpen },
+  { label: 'Tests', path: '/psychology-tests', Icon: Brain },
+  { label: 'Motivation', path: '/daily-motivation', Icon: Star },
 ];
 
 export default function AppLayout({ children, hideHeader = false }: AppLayoutProps) {
   const [showSettings, setShowSettings] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [username, setUsername] = useState('');
   const [communityName, setCommunityName] = useState('');
   const [notifGranted, setNotifGranted] = useState(false);
@@ -28,6 +31,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
   const [usernamePublic, setUsernamePublic] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('mindbloom_user');
@@ -43,6 +47,17 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
       setNotifGranted(Notification.permission === 'granted');
     }
   }, [showSettings]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+    if (showMenu) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showMenu]);
 
   const toggleUsernameVisibility = () => {
     const newVal = !usernamePublic;
@@ -66,15 +81,20 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
           new Notification(title, { body, icon: '/favicon.ico' });
         }, delayMs);
       };
-      scheduleNotif('🌸 Daily Check-in', 'How are you feeling today? Take a moment to log your mood in MindBloom.', 5000);
-      scheduleNotif('🧘 Exercise Reminder', 'Time for your daily breathing exercise! Just 5 minutes can transform your day.', 10000);
+      scheduleNotif('Daily Check-in', 'How are you feeling today? Take a moment to log your mood in MindBloom.', 5000);
+      scheduleNotif('Exercise Reminder', 'Time for your daily breathing exercise! Just 5 minutes can transform your day.', 10000);
     }
   };
 
+  const handleNavClick = (path: string) => {
+    setShowMenu(false);
+    router.push(path);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50" style={{ WebkitOverflowScrolling: 'touch' }}>
       {!hideHeader && (
-        <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60">
+        <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/60" ref={menuRef}>
           <div className="max-w-screen-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
             {/* Logo */}
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -82,27 +102,12 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               <span className="font-nunito font-800 text-lg text-purple-800 tracking-tight hidden sm:block">MindBloom</span>
             </div>
 
-            {/* Top Navigation Links */}
-            <nav className="flex items-center gap-0.5 sm:gap-1 flex-1 justify-center overflow-x-auto scrollbar-hide flex-nowrap">
-              {navItems.map((item) => {
-                const isActive = pathname === item.path;
-                return (
-                  <motion.button
-                    key={item.path}
-                    onClick={() => router.push(item.path)}
-                    whileTap={{ scale: 0.93 }}
-                    className={`flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-2xl text-[13px] sm:text-sm font-nunito font-600 transition-all duration-200 flex-shrink-0 ${
-                      isActive
-                        ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 shadow-sm'
-                        : 'text-purple-400 hover:text-purple-600 hover:bg-purple-50'
-                    }`}
-                  >
-                    <span className="text-[18px] sm:text-base leading-none">{item.emoji}</span>
-                    <span className="text-[13px] sm:text-sm">{item.label}</span>
-                  </motion.button>
-                );
-              })}
-            </nav>
+            {/* Center: current page label */}
+            <div className="flex-1 flex justify-center">
+              <span className="font-nunito font-700 text-sm text-purple-700">
+                {navItems.find(n => n.path === pathname)?.label ?? 'MindBloom'}
+              </span>
+            </div>
 
             {/* Right actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -124,12 +129,56 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               >
                 <Settings size={17} />
               </motion.button>
+              {/* Hamburger menu */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowMenu(v => !v)}
+                className="w-9 h-9 rounded-2xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-500 transition-colors"
+                aria-label="Open navigation menu"
+              >
+                <Menu size={17} />
+              </motion.button>
             </div>
           </div>
+
+          {/* Slide-down task menu */}
+          <AnimatePresence>
+            {showMenu && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                className="overflow-hidden border-t border-purple-100/60 bg-white/95 backdrop-blur-xl"
+              >
+                <nav className="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col gap-1">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.path;
+                    const { Icon } = item;
+                    return (
+                      <motion.button
+                        key={item.path}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleNavClick(item.path)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-nunito font-600 transition-all duration-200 text-left w-full ${
+                          isActive
+                            ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700' :'text-purple-500 hover:bg-purple-50 hover:text-purple-700'
+                        }`}
+                      >
+                        <Icon size={18} className={isActive ? 'text-purple-600' : 'text-purple-400'} />
+                        <span>{item.label}</span>
+                        {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400" />}
+                      </motion.button>
+                    );
+                  })}
+                </nav>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </header>
       )}
 
-      <main className="max-w-screen-2xl mx-auto px-4 py-4 xl:px-8 2xl:px-12 pt-20">
+      <main className="max-w-screen-2xl mx-auto px-4 py-4 xl:px-8 2xl:px-12 pt-20" style={{ scrollBehavior: 'smooth' }}>
         {children}
       </main>
 
@@ -151,7 +200,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
               className="bg-white/95 backdrop-blur-xl rounded-4xl p-6 w-full max-w-sm border border-purple-100 shadow-2xl"
             >
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-nunito font-800 text-lg text-purple-900">Profile & Settings 🌸</h2>
+                <h2 className="font-nunito font-800 text-lg text-purple-900">Profile & Settings</h2>
                 <button
                   onClick={() => setShowSettings(false)}
                   className="w-8 h-8 rounded-xl bg-purple-50 hover:bg-purple-100 flex items-center justify-center text-purple-500 transition-colors"
@@ -227,7 +276,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-nunito font-700 text-sm text-purple-900">Daily Reminders</p>
-                    <p className="text-xs font-dm text-purple-400">{notifGranted ? 'Notifications enabled ✓' : 'Tap to enable check-in reminders'}</p>
+                    <p className="text-xs font-dm text-purple-400">{notifGranted ? 'Notifications enabled' : 'Tap to enable check-in reminders'}</p>
                   </div>
                   <ChevronRight size={16} className="text-purple-300" />
                 </button>
@@ -256,32 +305,16 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-4 space-y-3 border-t border-purple-50">
-                        <div className="pt-3">
-                          <p className="font-nunito font-700 text-xs text-purple-800 mb-1">Terms of Service</p>
-                          <p className="text-xs font-dm text-purple-600 leading-relaxed">MindBloom is a personal wellness companion. By using this app, you agree to use it responsibly and understand it is not a substitute for professional mental health care.</p>
-                        </div>
-                        <div>
-                          <p className="font-nunito font-700 text-xs text-purple-800 mb-1">Privacy Policy</p>
-                          <p className="text-xs font-dm text-purple-600 leading-relaxed">Your diary entries and mood data are stored locally on your device. We do not collect, sell, or share your personal information with third parties.</p>
-                        </div>
-                        <div>
-                          <p className="font-nunito font-700 text-xs text-purple-800 mb-1">Community Guidelines</p>
-                          <p className="text-xs font-dm text-purple-600 leading-relaxed">Be kind, supportive, and respectful. No harmful, abusive, or triggering content. If you are in crisis, please contact a professional helpline immediately.</p>
-                        </div>
-                        <div className="bg-blue-50 rounded-2xl p-3 border border-blue-100">
-                          <p className="text-xs font-dm text-blue-700 leading-relaxed">🛡️ <strong>Disclaimer:</strong> MindBloom is not a medical device and does not provide clinical diagnosis or treatment. Always consult a qualified mental health professional for serious concerns.</p>
-                        </div>
+                      <div className="px-4 pb-4 text-xs font-dm text-purple-600 leading-relaxed border-t border-purple-50">
+                        <p className="pt-3">MindBloom is a wellness companion app. All data is stored locally on your device. We do not collect or share personal information. This app is not a substitute for professional mental health care.</p>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-
-              <p className="text-center text-[10px] font-dm text-purple-300 mt-4">MindBloom v1.0 · Made with 💜</p>
             </motion.div>
           </motion.div>
         )}

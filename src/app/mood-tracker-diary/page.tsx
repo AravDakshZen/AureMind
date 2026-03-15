@@ -7,36 +7,37 @@ import DiaryEditor from './components/DiaryEditor';
 import WeeklyMoodChart from './components/WeeklyMoodChart';
 import PastEntries from './components/PastEntries';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { PenLine } from 'lucide-react';
 
 export default function MoodTrackerDiaryPage() {
   const [showEditor, setShowEditor] = useState(false);
 
   return (
     <AppLayout>
-      <div className="space-y-6 py-2 relative">
+      <div className="space-y-6 py-2">
         <div>
-          <h1 className="font-nunito font-800 text-2xl text-purple-900">My Diary 📖</h1>
+          <h1 className="font-nunito font-800 text-2xl text-purple-900">My Diary</h1>
           <p className="text-sm font-dm text-purple-500 mt-0.5">
             {new Date()?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
+
+        {/* Mood input section */}
         <MoodInput />
+
+        {/* Create a Note button — placed directly under How are you feeling */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.01 }}
+          onClick={() => setShowEditor(true)}
+          className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-3xl bg-gradient-to-r from-purple-400 to-pink-400 text-white font-nunito font-700 text-sm shadow-md hover:shadow-lg transition-shadow"
+        >
+          <PenLine size={18} strokeWidth={2} />
+          Create a Note
+        </motion.button>
+
         <WeeklyMoodChart />
         <PastEntries />
-
-        {/* Floating + button */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.08 }}
-          onClick={() => setShowEditor(true)}
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 text-white shadow-xl flex items-center justify-center border-2 border-white/60"
-          aria-label="New diary entry"
-        >
-          <Plus size={26} strokeWidth={2.5} />
-        </motion.button>
 
         {/* Diary editor modal */}
         <AnimatePresence>
