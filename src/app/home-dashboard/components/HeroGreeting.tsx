@@ -131,8 +131,10 @@ export default function HeroGreeting() {
   const confirmCheckin = () => {
     const today = getDateKey(new Date());
     const yesterday = getDateKey(new Date(Date.now() - 86400000));
-    const newCurrentStreak = streak.lastCheckin === yesterday ? streak.currentStreak + 1 : 1;
-    const newBestStreak = Math.max(newCurrentStreak, streak.bestStreak);
+    const safeCurrentStreak = Number(streak.currentStreak) || 0;
+    const safeBestStreak = Number(streak.bestStreak) || 0;
+    const newCurrentStreak = streak.lastCheckin === yesterday ? safeCurrentStreak + 1 : 1;
+    const newBestStreak = Math.max(newCurrentStreak, safeBestStreak);
     const newCheckinDays = [
       ...(streak.checkinDays || []).filter(d => {
         const diff = (new Date(today).getTime() - new Date(d).getTime()) / 86400000;
@@ -171,7 +173,7 @@ export default function HeroGreeting() {
   };
 
   const last7 = getLast7Days();
-  const streakInfo = getStreakInfo(streak.currentStreak);
+  const streakInfo = getStreakInfo(streak.currentStreak || 0);
   const checkedCount = streak.checkinDays?.filter(d => last7.includes(d)).length ?? 0;
   const todayNote = streak.notes?.find(n => n.date === getDateKey(new Date()));
 
@@ -275,7 +277,7 @@ export default function HeroGreeting() {
                   <Flame size={16} className="text-orange-500" />
                 </div>
                 <div>
-                  <p className="font-nunito font-800 text-xl text-orange-600 leading-none">{streak.currentStreak}</p>
+                  <p className="font-nunito font-800 text-xl text-orange-600 leading-none">{Number(streak.currentStreak) || 0}</p>
                   <p className="text-[9px] font-dm text-orange-500 mt-0.5">Current Streak</p>
                 </div>
               </div>
@@ -284,7 +286,7 @@ export default function HeroGreeting() {
                   <Trophy size={16} className="text-yellow-600" />
                 </div>
                 <div>
-                  <p className="font-nunito font-800 text-xl text-yellow-600 leading-none">{streak.bestStreak}</p>
+                  <p className="font-nunito font-800 text-xl text-yellow-600 leading-none">{Number(streak.bestStreak) || 0}</p>
                   <p className="text-[9px] font-dm text-yellow-600 mt-0.5">Best Streak</p>
                 </div>
               </div>
@@ -326,7 +328,7 @@ export default function HeroGreeting() {
               })}
             </div>
             <p className="text-xs font-dm text-purple-500 mt-2 text-center">
-              {checkedCount}/7 days checked in 🌟
+              {Number(checkedCount) || 0}/7 days checked in 🌟
             </p>
 
             {/* Today's note */}
