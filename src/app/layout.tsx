@@ -1,9 +1,17 @@
 import type { Metadata } from 'next';
+import type { Viewport } from 'next';
 import '../styles/tailwind.css';
 import { Toaster } from 'sonner';
 import OnboardingModal from '@/components/OnboardingModal';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mindbloom2967.builtwithrocket.new';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#a855f7',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -48,12 +56,6 @@ export const metadata: Metadata = {
     apple: '/assets/images/app_logo.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#a855f7',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,9 +67,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <style dangerouslySetInnerHTML={{ __html: `
           @font-face { font-display: swap; }
         `}} />
-      
-      <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fmindbloom2967back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.17" />
-      <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2" /></head>
+
+        <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fmindbloom2967back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.17" />
+        <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.2" /></head>
       <body className="font-dm antialiased">
         <OnboardingModal />
         {children}
