@@ -12,37 +12,20 @@ interface AppLogoProps {
 }
 
 const AppLogo = memo(function AppLogo({
-  size = 44,
   className = '',
   onClick,
 }: AppLogoProps) {
-  const iconSize = size;
-
   return (
     <div
-      className={`flex items-center gap-2 ${onClick ? 'cursor-pointer hover:opacity-85 transition-opacity' : ''} ${className}`}
+      className={`flex items-center ${onClick ? 'cursor-pointer hover:opacity-85 transition-opacity' : ''} ${className}`}
       onClick={onClick}
     >
-      {/* Logo Image */}
-      <div className="flex-shrink-0 relative" style={{ width: iconSize, height: iconSize }}>
-        <img
-          src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773661537529.png"
-          alt="AureMind logo"
-          style={{ width: 'auto', height: iconSize, objectFit: 'contain' }}
-        />
-      </div>
-      {/* Brand Name */}
-      <span
-        className="font-nunito font-bold text-lg leading-none"
-        style={{
-          background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #EC4899 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-        }}
-      >
-        AureMind
-      </span>
+      {/* Logo Image Only */}
+      <img
+        src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773661537529.png"
+        alt="AureMind logo"
+        className="h-8 sm:h-9 md:h-10 w-auto object-contain flex-shrink-0"
+      />
     </div>
   );
 });
