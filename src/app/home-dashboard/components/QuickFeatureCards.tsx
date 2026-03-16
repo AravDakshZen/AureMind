@@ -35,7 +35,7 @@ const features = [
   },
   {
     title: 'Wellness',
-    desc: 'Daily quotes & sounds',
+    desc: 'Relax & Reset',
     emoji: '✨',
     gradient: 'gradient-pink',
     path: '/daily-motivation',
