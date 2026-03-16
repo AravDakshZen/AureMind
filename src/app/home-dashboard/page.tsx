@@ -8,7 +8,6 @@ import FloatingDoodles from './components/FloatingDoodles';
 // Lazy load heavier below-the-fold components
 const WeeklyMoodSummary = lazy(() => import('./components/WeeklyMoodSummary'));
 const WellnessTips = lazy(() => import('./components/WellnessTips'));
-const SoundCards = lazy(() => import('./components/SoundCards'));
 const CommunityPreview = lazy(() => import('./components/CommunityPreview'));
 
 function SectionSkeleton() {
@@ -30,9 +29,6 @@ export default function HomeDashboardPage() {
         <QuickFeatureCards />
         <Suspense fallback={<SectionSkeleton />}>
           <WellnessTips />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SoundCards />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <CommunityPreview />

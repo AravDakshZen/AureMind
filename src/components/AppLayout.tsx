@@ -32,7 +32,7 @@ interface UserData {
 
 const navItems = [
 { label: 'Home', path: '/home-dashboard', Icon: Home },
-{ label: 'Motivation', path: '/daily-motivation', Icon: Star },
+{ label: 'Wellness', path: '/daily-motivation', Icon: Star },
 { label: 'Diary', path: '/mood-tracker-diary', Icon: BookOpen },
 { label: 'Tests', path: '/psychology-tests', Icon: Brain },
 { label: 'Community', path: '/community-section', Icon: Users2 }];
@@ -372,7 +372,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 60, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="bg-white/95 backdrop-blur-xl rounded-4xl w-full max-w-sm border border-purple-100 shadow-2xl max-h-[90vh] flex flex-col">
+            className="bg-white/95 backdrop-blur-xl rounded-4xl w-full max-w-sm border border-purple-100/60 shadow-2xl max-h-[90vh] flex flex-col">
 
               <div className="flex items-center justify-between p-5 pb-3 flex-shrink-0">
                 <h2 className="font-nunito font-800 text-lg text-purple-900">Settings</h2>
@@ -391,7 +391,7 @@ export default function AppLayout({ children, hideHeader = false }: AppLayoutPro
                 onClick={() => setActiveSettingsTab(tab)}
                 className={`flex-1 py-2 rounded-xl text-xs font-nunito font-700 capitalize transition-all min-h-[36px] ${
                 activeSettingsTab === tab ?
-                'bg-gradient-to-r from-purple-400 to-pink-400 text-white shadow-sm' :
+                'bg-gradient-to-r from-purple-400 to-pink-400 text-white shadow-md shadow-purple-200/50' :
                 'bg-purple-50 text-purple-500 hover:bg-purple-100'}`
                 }>
 

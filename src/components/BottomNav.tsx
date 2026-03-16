@@ -52,7 +52,7 @@ const navItems = [
     ),
   },
   {
-    label: 'Motivation',
+    label: 'Wellness',
     path: '/daily-motivation',
     emoji: '✨',
     doodle: (
