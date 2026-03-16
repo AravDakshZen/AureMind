@@ -53,7 +53,7 @@ export default function IntroPage() {
         <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-blue-200/20 blur-3xl" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full px-6 py-4 max-w-5xl mx-auto w-full">
+      <div className="relative z-10 flex flex-col h-full px-6 py-4 max-w-4xl mx-auto w-full">
 
         {/* ── Header ── */}
         <motion.div
@@ -61,7 +61,7 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-4 flex-shrink-0"
+          className="text-center mb-3 flex-shrink-0"
         >
           <div className="flex justify-center mb-1.5">
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
@@ -76,8 +76,8 @@ export default function IntroPage() {
           </p>
         </motion.div>
 
-        {/* ── Vertical Portrait Cards Row ── */}
-        <div className="flex flex-row gap-4 flex-1 justify-center items-stretch min-h-0">
+        {/* ── Alternating Left/Right Cards ── */}
+        <div className="flex flex-col gap-3 flex-1 justify-center min-h-0">
           {sections.map((section, i) => (
             <motion.div
               key={section.title}
@@ -86,35 +86,35 @@ export default function IntroPage() {
               animate="visible"
               variants={fadeUp}
               whileHover={{
-                y: -8,
+                y: -6,
                 boxShadow: '0 24px 48px -8px rgba(139, 92, 246, 0.30)',
                 transition: { duration: 0.25, ease: 'easeOut' },
               }}
-              className="flex-1 cursor-default"
+              className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'} cursor-default`}
             >
               <div
-                className={`h-full rounded-3xl p-5 md:p-6 border shadow-md ${section.bg} transition-shadow duration-300 flex flex-col`}
+                className={`w-[72%] rounded-3xl p-4 md:p-5 border shadow-md ${section.bg} transition-shadow duration-300 flex flex-col`}
                 style={{ backdropFilter: 'blur(12px)' }}
               >
-                {/* Icon */}
-                <div className="flex justify-center mb-4">
+                <div className="flex items-center gap-3 mb-2">
+                  {/* Icon */}
                   <div
-                    className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-md`}
+                    className={`w-12 h-12 flex-shrink-0 rounded-2xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-md`}
                   >
                     <span className="text-2xl">{section.emoji}</span>
                   </div>
+
+                  {/* Title + Divider */}
+                  <div className="flex flex-col">
+                    <h2 className="font-nunito font-bold text-base md:text-lg text-purple-900">
+                      {section.title}
+                    </h2>
+                    <div className={`h-0.5 w-8 rounded-full bg-gradient-to-r ${section.gradient} mt-1 opacity-60`} />
+                  </div>
                 </div>
 
-                {/* Title */}
-                <h2 className="font-nunito font-bold text-base md:text-lg text-purple-900 text-center mb-3">
-                  {section.title}
-                </h2>
-
-                {/* Divider */}
-                <div className={`h-0.5 w-10 mx-auto rounded-full bg-gradient-to-r ${section.gradient} mb-3 opacity-60`} />
-
                 {/* Text */}
-                <p className="font-dm text-xs md:text-sm text-purple-700 leading-relaxed text-center flex-1">
+                <p className="font-dm text-xs md:text-sm text-purple-700 leading-relaxed">
                   {section.text}
                 </p>
               </div>
@@ -128,7 +128,7 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="flex justify-center mt-4 flex-shrink-0"
+          className="flex justify-center mt-3 flex-shrink-0"
         >
           <motion.button
             whileHover={{ scale: 1.04, y: -2 }}
