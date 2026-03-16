@@ -81,7 +81,7 @@ export default function IntroPage() {
         </motion.div>
 
         {/* Alternating Left/Right Cards */}
-        <div className="flex flex-col gap-3 flex-1 justify-center min-h-0">
+        <div className="flex flex-col gap-2 flex-1 justify-center min-h-0">
           {sections.map((section, i) => (
             <motion.div
               key={section.title}
@@ -97,10 +97,10 @@ export default function IntroPage() {
               className={`flex justify-${section.align} cursor-default`}
             >
               <div
-                className={`w-[38%] min-h-[160px] rounded-3xl p-4 md:p-5 border shadow-md ${section.bg} transition-shadow duration-300 flex flex-col`}
+                className={`w-[38%] min-h-[240px] rounded-3xl p-5 md:p-6 border shadow-md ${section.bg} transition-shadow duration-300 flex flex-col`}
                 style={{ backdropFilter: 'blur(14px)' }}
               >
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3 mb-3">
                   {/* Title + Divider */}
                   <div className="flex flex-col">
                     <h2 className="font-nunito font-bold text-base md:text-lg text-purple-900">
