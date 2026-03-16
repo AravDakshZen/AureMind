@@ -117,28 +117,9 @@ export default function IntroPage() {
             <img
               src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773660786216.png"
               alt="AureMind logo"
-              style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+              style={{ width: '120px', height: '120px', objectFit: 'contain' }}
             />
           </div>
-
-          <h1
-            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-2"
-            style={{
-              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #a855f7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            AureMind
-          </h1>
-          <p
-            className="font-dm font-semibold text-sm md:text-base tracking-widest uppercase mb-1"
-            style={{ color: '#7c3aed', opacity: 0.72, letterSpacing: '0.14em' }}
-          >
-            Elevate Your Mind · Embrace Your Calm
-          </p>
 
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-4">
