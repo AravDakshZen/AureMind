@@ -29,7 +29,7 @@ const AppLogo = memo(function AppLogo({
       {/* Logo Image */}
       <div className="flex-shrink-0 relative" style={{ width: iconSize, height: iconSize }}>
         <img
-          src="/assets/images/ChatGPT_Image_Mar_16__2026__04_53_43_PM-1773660498579.png"
+          src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773660786216.png"
           alt="AureMind logo"
           style={{ width: iconSize, height: iconSize, objectFit: 'contain' }}
         />
