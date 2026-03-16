@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <!-- Gradient for the first wave (Bottom-Left to Top-Right) -->
+    <linearGradient id="wave1-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6d28d9" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+
+    <!-- Gradient for the second wave (Bottom-Right to Top-Left) -->
+    <linearGradient id="wave2-grad" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#6d28d9" />
+      <stop offset="50%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+
+    <!-- Subtle edge highlight to give the ribbons a glassy, 3D volume -->
+    <linearGradient id="edge-light" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Ambient glow for the center intersection -->
+    <filter id="center-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Ambient background glow to enhance the "Aure" (aura) concept -->
+  <circle cx="32" cy="32" r="12" fill="#a855f7" opacity="0.15" filter="url(#center-glow)" />
+
+  <!-- Wave 1: Bottom-Left to Top-Right S-Curve -->
+  <g transform="translate(-1.5, -1.5)">
+    <path 
+      d="M 14 47 
+         C 26 42, 38 6, 50 11 
+         A 3 3 0 0 1 50 17 
+         C 38 22, 26 58, 14 53 
+         A 3 3 0 0 1 14 47 Z" 
+      fill="url(#wave1-grad)" 
+      fill-opacity="0.85"
+      stroke="url(#edge-light)" 
+      stroke-width="0.5"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Wave 2: Mirrored and offset (Bottom-Right to Top-Left) -->
+  <g transform="translate(1.5, 1.5)">
+    <path 
+      d="M 50 47 
+         C 38 42, 26 6, 14 11 
+         A 3 3 0 0 0 14 17 
+         C 26 22, 38 58, 50 53 
+         A 3 3 0 0 0 50 47 Z" 
+      fill="url(#wave2-grad)" 
+      fill-opacity="0.85"
+      stroke="url(#edge-light)" 
+      stroke-width="0.5"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>

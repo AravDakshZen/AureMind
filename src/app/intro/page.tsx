@@ -112,38 +112,19 @@ export default function IntroPage() {
 
         {/* Header — brand identity */}
         <div className="text-center mb-10 md:mb-14">
-          {/* Logo mark */}
+          {/* Logo image */}
           <div className="flex justify-center mb-4">
-            <div
-              className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #CDB4DB 0%, #A2D2FF 50%, #FFAFCC 100%)',
-                boxShadow: '0 8px 32px rgba(205,180,219,0.5), 0 2px 8px rgba(162,210,255,0.3)',
-              }}
-            >
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4C16 4 8 10 8 18C8 22.4 11.6 26 16 26C20.4 26 24 22.4 24 18C24 10 16 4 16 4Z" fill="white" fillOpacity="0.9"/>
-                <path d="M16 10C16 10 11 14 11 19C11 21.8 13.2 24 16 24C18.8 24 21 21.8 21 19C21 14 16 10 16 10Z" fill="white" fillOpacity="0.5"/>
-                <circle cx="16" cy="19" r="3" fill="white"/>
-              </svg>
-              {/* Glow ring */}
-              <div
-                className="absolute inset-0 rounded-2xl"
-                style={{
-                  background: 'linear-gradient(135deg, #CDB4DB, #A2D2FF, #FFAFCC)',
-                  opacity: 0.4,
-                  filter: 'blur(8px)',
-                  transform: 'scale(1.3)',
-                  zIndex: -1,
-                }}
-              />
-            </div>
+            <img
+              src="/assets/images/ChatGPT_Image_Mar_16__2026__04_53_43_PM-1773660498579.png"
+              alt="AureMind logo"
+              style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+            />
           </div>
 
           <h1
-            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-3"
+            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-2"
             style={{
-              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #be185d 100%)',
+              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #a855f7 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -153,10 +134,10 @@ export default function IntroPage() {
             AureMind
           </h1>
           <p
-            className="font-dm font-medium text-base md:text-lg tracking-wide"
-            style={{ color: '#7c3aed', opacity: 0.75 }}
+            className="font-dm font-semibold text-sm md:text-base tracking-widest uppercase mb-1"
+            style={{ color: '#7c3aed', opacity: 0.72, letterSpacing: '0.14em' }}
           >
-            Elevate Your Mind, Embrace Your Calm
+            Elevate Your Mind · Embrace Your Calm
           </p>
 
           {/* Decorative line */}
@@ -211,7 +192,7 @@ export default function IntroPage() {
                     The Challenge
                   </span>
                   <h2 className="font-nunito font-extrabold text-xl md:text-2xl text-purple-900 leading-tight">
-                    Problem Statement
+                    Problem
                   </h2>
                 </div>
               </div>
