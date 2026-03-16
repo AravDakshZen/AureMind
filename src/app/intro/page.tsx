@@ -2,28 +2,44 @@
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const sections = [
   {
     title: 'Problem Statement',
-    emoji: '💭',
-    gradient: 'from-purple-400 to-purple-500',
-    bg: 'bg-white/70 backdrop-blur-sm border-white/80',
-    text: 'Many people today struggle with stress, emotional burnout, and mental health challenges. In a fast-moving world, people rarely have a calm space to pause, reflect, and understand their emotions.',
+    align: 'start' as const,
+    gradient: 'from-purple-500 to-purple-600',
+    bg: 'bg-white/75 border-white/80',
+    text: 'Many people today struggle with stress, anxiety, emotional burnout, and mental health challenges. In a fast-paced world, individuals rarely have a calm space to pause, reflect, and understand their emotions.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+    ),
   },
   {
     title: 'Solution',
-    emoji: '✨',
-    gradient: 'from-pink-400 to-pink-500',
-    bg: 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100/60',
-    text: 'AureMind offers a peaceful digital environment where users can track their mood, reflect through journaling, explore self-awareness tools, and stay motivated while connecting with a supportive community.',
+    align: 'end' as const,
+    gradient: 'from-pink-500 to-rose-500',
+    bg: 'bg-white/75 border-white/80',
+    text: 'AureMind provides a peaceful digital environment where users can track their mood, reflect through journaling, explore self-reflection tools, stay motivated, and connect with a supportive community.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+      </svg>
+    ),
   },
   {
     title: 'Why We Exist',
-    emoji: '🌱',
-    gradient: 'from-blue-400 to-purple-400',
-    bg: 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-100/60',
-    text: 'AureMind exists to help individuals understand their inner world and build emotional balance through reflection, mindfulness, and positive daily habits.',
+    align: 'start' as const,
+    gradient: 'from-blue-500 to-purple-500',
+    bg: 'bg-white/75 border-white/80',
+    text: 'AureMind exists to empower individuals to better understand their inner world and build emotional balance through reflection, awareness, and positive daily habits.',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-white" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+      </svg>
+    ),
   },
 ];
 
@@ -45,17 +61,25 @@ export default function IntroPage() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col">
-      {/* Decorative background blobs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-purple-200/30 blur-3xl" />
-        <div className="absolute top-1/3 -right-24 w-80 h-80 rounded-full bg-pink-200/30 blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-blue-200/20 blur-3xl" />
+    <div className="h-screen overflow-hidden relative flex flex-col">
+      {/* Background image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/assets/images/intro_bg_wellness.png"
+          alt="Calm nature-inspired wellness background with soft sky and gentle landscape"
+          fill
+          className="object-cover"
+          priority
+        />
+        {/* Overlay to ensure readability */}
+        <div className="absolute inset-0 bg-white/55" />
+        <div className="absolute inset-0 backdrop-blur-[2px]" />
       </div>
 
+      {/* Content */}
       <div className="relative z-10 flex flex-col h-full px-6 py-4 max-w-4xl mx-auto w-full">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <motion.div
           custom={0}
           initial="hidden"
@@ -63,20 +87,15 @@ export default function IntroPage() {
           variants={fadeUp}
           className="text-center mb-3 flex-shrink-0"
         >
-          <div className="flex justify-center mb-1.5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
-              <span className="text-xl">🌸</span>
-            </div>
-          </div>
-          <h1 className="font-nunito font-extrabold text-2xl md:text-3xl text-purple-900 tracking-tight mb-0.5">
+          <h1 className="font-nunito font-extrabold text-3xl md:text-4xl text-purple-900 tracking-tight mb-1 drop-shadow-sm">
             AureMind
           </h1>
-          <p className="font-dm font-semibold text-sm text-purple-600 whitespace-nowrap">
+          <p className="font-dm font-semibold text-sm md:text-base text-purple-700 whitespace-nowrap">
             Elevate Your Mind, Embrace Your Calm
           </p>
         </motion.div>
 
-        {/* ── Alternating Left/Right Cards ── */}
+        {/* Alternating Left/Right Cards */}
         <div className="flex flex-col gap-3 flex-1 justify-center min-h-0">
           {sections.map((section, i) => (
             <motion.div
@@ -90,18 +109,18 @@ export default function IntroPage() {
                 boxShadow: '0 24px 48px -8px rgba(139, 92, 246, 0.30)',
                 transition: { duration: 0.25, ease: 'easeOut' },
               }}
-              className={`flex ${i % 2 === 0 ? 'justify-start' : 'justify-end'} cursor-default`}
+              className={`flex justify-${section.align} cursor-default`}
             >
               <div
                 className={`w-[72%] rounded-3xl p-4 md:p-5 border shadow-md ${section.bg} transition-shadow duration-300 flex flex-col`}
-                style={{ backdropFilter: 'blur(12px)' }}
+                style={{ backdropFilter: 'blur(14px)' }}
               >
                 <div className="flex items-center gap-3 mb-2">
                   {/* Icon */}
                   <div
-                    className={`w-12 h-12 flex-shrink-0 rounded-2xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-md`}
+                    className={`w-11 h-11 flex-shrink-0 rounded-2xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-md`}
                   >
-                    <span className="text-2xl">{section.emoji}</span>
+                    {section.icon}
                   </div>
 
                   {/* Title + Divider */}
@@ -114,7 +133,7 @@ export default function IntroPage() {
                 </div>
 
                 {/* Text */}
-                <p className="font-dm text-xs md:text-sm text-purple-700 leading-relaxed">
+                <p className="font-dm text-xs md:text-sm text-purple-800 leading-relaxed">
                   {section.text}
                 </p>
               </div>
@@ -122,7 +141,7 @@ export default function IntroPage() {
           ))}
         </div>
 
-        {/* ── Continue Button ── */}
+        {/* Continue Button */}
         <motion.div
           custom={4}
           initial="hidden"
@@ -136,7 +155,7 @@ export default function IntroPage() {
             onClick={handleContinue}
             className="px-10 py-3 rounded-2xl font-nunito font-bold text-base text-white bg-gradient-to-r from-purple-500 to-pink-400 shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transition-shadow duration-300"
           >
-            Continue →
+            Continue
           </motion.button>
         </motion.div>
 
@@ -146,7 +165,7 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center text-xs font-dm text-purple-400 mt-2 mb-1 flex-shrink-0"
+          className="text-center text-xs font-dm text-purple-600 mt-2 mb-1 flex-shrink-0"
         >
           Your data stays on your device. We respect your privacy.
         </motion.p>
