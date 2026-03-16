@@ -1,17 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 export default function IntroPage() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -31,7 +26,7 @@ export default function IntroPage() {
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="min-h-screen w-full relative overflow-hidden flex flex-col"
+      className="min-h-screen w-full relative flex flex-col"
       style={{
         background: 'linear-gradient(135deg, #f3e8ff 0%, #e8f4ff 35%, #fce4f0 65%, #ede9fe 100%)',
       }}
@@ -90,42 +85,33 @@ export default function IntroPage() {
       </div>
 
       {/* Floating particles */}
-      {mounted && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                width: `${4 + (i % 4) * 3}px`,
-                height: `${4 + (i % 4) * 3}px`,
-                left: `${8 + i * 7.5}%`,
-                top: `${15 + ((i * 37) % 65)}%`,
-                background: i % 3 === 0
-                  ? 'rgba(205,180,219,0.6)'
-                  : i % 3 === 1
-                  ? 'rgba(162,210,255,0.6)'
-                  : 'rgba(255,175,204,0.6)',
-                animation: `floatParticle ${5 + (i % 4)}s ease-in-out infinite`,
-                animationDelay: `${i * 0.4}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: `${4 + (i % 4) * 3}px`,
+              height: `${4 + (i % 4) * 3}px`,
+              left: `${8 + i * 7.5}%`,
+              top: `${15 + ((i * 37) % 65)}%`,
+              background: i % 3 === 0
+                ? 'rgba(205,180,219,0.6)'
+                : i % 3 === 1
+                ? 'rgba(162,210,255,0.6)'
+                : 'rgba(255,175,204,0.6)',
+              animation: `floatParticle ${5 + (i % 4)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.4}s`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col min-h-screen px-5 md:px-10 py-8 max-w-5xl mx-auto w-full">
 
         {/* Header — brand identity */}
-        <div
-          className="text-center mb-10 md:mb-14"
-          style={{
-            opacity: mounted ? 1 : 0,
-            transform: mounted ? 'translateY(0)' : 'translateY(-24px)',
-            transition: 'opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          }}
-        >
+        <div className="text-center mb-10 md:mb-14">
           {/* Logo mark */}
           <div className="flex justify-center mb-4">
             <div
@@ -192,9 +178,6 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(205,180,219,0.4)',
               boxShadow: '0 8px 32px rgba(205,180,219,0.18), 0 2px 8px rgba(0,0,0,0.04)',
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0) translateX(0)' : 'translateY(30px) translateX(-20px)',
-              transition: 'opacity 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s, box-shadow 0.3s ease',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(205,180,219,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -263,9 +246,6 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(162,210,255,0.4)',
               boxShadow: '0 8px 32px rgba(162,210,255,0.18), 0 2px 8px rgba(0,0,0,0.04)',
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0) translateX(0)' : 'translateY(30px) translateX(20px)',
-              transition: 'opacity 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s, box-shadow 0.3s ease',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(162,210,255,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -326,9 +306,6 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,175,204,0.4)',
               boxShadow: '0 8px 32px rgba(255,175,204,0.2), 0 2px 8px rgba(0,0,0,0.04)',
-              opacity: mounted ? 1 : 0,
-              transform: mounted ? 'translateY(0)' : 'translateY(30px)',
-              transition: 'opacity 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.45s, box-shadow 0.3s ease',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(255,175,204,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -399,14 +376,7 @@ export default function IntroPage() {
         </div>
 
         {/* Continue button */}
-        <div
-          className="flex flex-col items-center gap-3 pb-8"
-          style={{
-            opacity: mounted ? 1 : 0,
-            transform: mounted ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.65s, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.65s',
-          }}
-        >
+        <div className="flex flex-col items-center gap-3 pb-8">
           <button
             onClick={handleContinue}
             className="relative group px-12 py-4 rounded-2xl font-nunito font-bold text-base text-white overflow-hidden"
