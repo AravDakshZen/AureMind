@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState, memo } from 'react';
+import { ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 const features = [
   {
@@ -59,6 +60,11 @@ const features = [
     textColor: 'text-amber-800',
     type: 'consult',
   },
+];
+
+const slides = [
+  features.slice(0, 3),
+  features.slice(3, 6),
 ];
 
 // Self Care: floating breath circles
@@ -189,47 +195,136 @@ function CardAnimation({ type }: { type: string }) {
   }
 }
 
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? '-100%' : '100%',
+    opacity: 0,
+  }),
+};
+
 const QuickFeatureCards = memo(function QuickFeatureCards() {
   const router = useRouter();
   const [activeCard, setActiveCard] = useState<number | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [direction, setDirection] = useState(1);
+
+  const goToNext = () => {
+    if (currentSlide < slides.length - 1) {
+      setDirection(1);
+      setCurrentSlide((prev) => prev + 1);
+    }
+  };
+
+  const goToPrev = () => {
+    if (currentSlide > 0) {
+      setDirection(-1);
+      setCurrentSlide((prev) => prev - 1);
+    }
+  };
+
+  const currentFeatures = slides[currentSlide];
 
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
         <h2 className="font-nunito font-700 text-lg text-purple-900">Help Yourself 🌈</h2>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={goToPrev}
+            disabled={currentSlide === 0}
+            className={`p-1.5 rounded-full transition-all duration-200 ${
+              currentSlide === 0
+                ? 'opacity-30 cursor-not-allowed bg-purple-100' :'bg-purple-100 hover:bg-purple-200 active:scale-95'
+            }`}
+            aria-label="Previous slide"
+          >
+            <ChevronLeftIcon className="w-4 h-4 text-purple-700" />
+          </button>
+          <button
+            onClick={goToNext}
+            disabled={currentSlide === slides.length - 1}
+            className={`p-1.5 rounded-full transition-all duration-200 ${
+              currentSlide === slides.length - 1
+                ? 'opacity-30 cursor-not-allowed bg-purple-100' :'bg-purple-100 hover:bg-purple-200 active:scale-95'
+            }`}
+            aria-label="Next slide"
+          >
+            <ChevronRightIcon className="w-4 h-4 text-purple-700" />
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {features.map((f, i) => (
-          <motion.button
-            key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.07 }}
-            whileTap={{ scale: 0.92 }}
-            onHoverStart={() => setActiveCard(i)}
-            onHoverEnd={() => setActiveCard(null)}
-            onFocus={() => setActiveCard(i)}
-            onBlur={() => setActiveCard(null)}
-            onClick={() => router.push(f.path)}
-            className={`relative ${f.gradient} rounded-3xl p-4 flex flex-col items-center gap-3 shadow-sm border border-white/60 cursor-pointer transition-all duration-300 overflow-hidden w-full ${activeCard === i ? 'ring-2 ring-purple-300 shadow-lg' : ''}`}
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentSlide}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="grid grid-cols-3 gap-3"
           >
-            <AnimatePresence>
-              {activeCard === i && <CardAnimation type={f.type} />}
-            </AnimatePresence>
+            {currentFeatures.map((f, i) => {
+              const globalIndex = currentSlide * 3 + i;
+              return (
+                <motion.button
+                  key={f.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileTap={{ scale: 0.92 }}
+                  onHoverStart={() => setActiveCard(globalIndex)}
+                  onHoverEnd={() => setActiveCard(null)}
+                  onFocus={() => setActiveCard(globalIndex)}
+                  onBlur={() => setActiveCard(null)}
+                  onClick={() => router.push(f.path)}
+                  className={`relative ${f.gradient} rounded-3xl p-4 flex flex-col items-center gap-3 shadow-sm border border-white/60 cursor-pointer transition-all duration-300 overflow-hidden w-full ${activeCard === globalIndex ? 'ring-2 ring-purple-300 shadow-lg' : ''}`}
+                >
+                  <AnimatePresence>
+                    {activeCard === globalIndex && <CardAnimation type={f.type} />}
+                  </AnimatePresence>
 
-            <motion.span
-              className="text-3xl relative z-10"
-              animate={activeCard === i ? { scale: [1, 1.18, 1] } : { scale: 1 }}
-              transition={{ duration: 1.4, repeat: activeCard === i ? Infinity : 0 }}
-            >
-              {f.emoji}
-            </motion.span>
-            <div className="text-center relative z-10">
-              <p className={`font-nunito font-700 text-xs ${f.textColor} leading-tight`}>{f.title}</p>
-              <p className={`text-[10px] font-dm ${f.textColor} opacity-70 leading-tight mt-0.5`}>{f.desc}</p>
-            </div>
-          </motion.button>
+                  <motion.span
+                    className="text-3xl relative z-10"
+                    animate={activeCard === globalIndex ? { scale: [1, 1.18, 1] } : { scale: 1 }}
+                    transition={{ duration: 1.4, repeat: activeCard === globalIndex ? Infinity : 0 }}
+                  >
+                    {f.emoji}
+                  </motion.span>
+                  <div className="text-center relative z-10">
+                    <p className={`font-nunito font-700 text-xs ${f.textColor} leading-tight`}>{f.title}</p>
+                    <p className={`text-[10px] font-dm ${f.textColor} opacity-70 leading-tight mt-0.5`}>{f.desc}</p>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="flex justify-center gap-1.5 mt-3">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              setDirection(i > currentSlide ? 1 : -1);
+              setCurrentSlide(i);
+            }}
+            className={`rounded-full transition-all duration-300 ${
+              i === currentSlide ? 'w-4 h-1.5 bg-purple-500' : 'w-1.5 h-1.5 bg-purple-200'
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+          />
         ))}
       </div>
     </div>
