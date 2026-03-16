@@ -24,7 +24,7 @@ const AppLogo = memo(function AppLogo({
       <img
         src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773661537529.png"
         alt="AureMind logo"
-        className="h-8 sm:h-9 md:h-10 w-auto object-contain flex-shrink-0"
+        className="h-16 sm:h-18 md:h-20 w-auto object-contain flex-shrink-0"
       />
     </div>
   );
