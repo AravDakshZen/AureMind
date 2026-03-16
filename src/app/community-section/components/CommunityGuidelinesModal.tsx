@@ -59,7 +59,7 @@ export default function CommunityGuidelinesModal({ onAccepted }: CommunityGuidel
     } else {
       onAccepted();
     }
-  }, [onAccepted]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAccept = () => {
     if (!checked) return;
