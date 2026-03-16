@@ -34,6 +34,8 @@ const posts = [
   },
 ];
 
+const topPosts = [...posts]?.sort((a, b) => (b?.likes + b?.comments) - (a?.likes + a?.comments))?.slice(0, 2);
+
 export default function CommunityPreview() {
   const router = useRouter();
 
@@ -50,7 +52,7 @@ export default function CommunityPreview() {
         </motion.button>
       </div>
       <div className="space-y-3">
-        {posts?.map((p, i) => (
+        {topPosts?.map((p, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 15 }}
