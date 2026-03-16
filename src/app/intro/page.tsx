@@ -111,7 +111,7 @@ export default function IntroPage() {
       <div className="relative z-10 flex flex-col min-h-screen px-5 md:px-10 py-8 max-w-5xl mx-auto w-full">
 
         {/* Header — brand identity */}
-        <div className="text-center mb-10 md:mb-14">
+        <div className="text-center mb-10 md:mb-14" style={{ animation: 'slideInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
           {/* Logo image */}
           <div className="flex justify-center mb-4">
             <img
@@ -140,6 +140,7 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(205,180,219,0.4)',
               boxShadow: '0 8px 32px rgba(205,180,219,0.18), 0 2px 8px rgba(0,0,0,0.04)',
+              animation: 'slideInLeft 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(205,180,219,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -208,6 +209,7 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(162,210,255,0.4)',
               boxShadow: '0 8px 32px rgba(162,210,255,0.18), 0 2px 8px rgba(0,0,0,0.04)',
+              animation: 'slideInRight 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(162,210,255,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -268,6 +270,7 @@ export default function IntroPage() {
               backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,175,204,0.4)',
               boxShadow: '0 8px 32px rgba(255,175,204,0.2), 0 2px 8px rgba(0,0,0,0.04)',
+              animation: 'slideInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both',
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLDivElement).style.boxShadow = '0 20px 60px rgba(255,175,204,0.35), 0 4px 16px rgba(0,0,0,0.06)';
@@ -338,7 +341,7 @@ export default function IntroPage() {
         </div>
 
         {/* Continue button */}
-        <div className="flex flex-col items-center gap-3 pb-8">
+        <div className="flex flex-col items-center gap-3 pb-8" style={{ animation: 'slideInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.8s both' }}>
           <button
             onClick={handleContinue}
             className="relative group px-12 py-4 rounded-2xl font-nunito font-bold text-base text-white overflow-hidden"
@@ -402,6 +405,22 @@ export default function IntroPage() {
         @keyframes floatParticle {
           0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
           50% { transform: translateY(-18px) scale(1.2); opacity: 0.9; }
+        }
+        @keyframes slideInDown {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-50px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(50px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
