@@ -2,7 +2,7 @@ import { Suspense, lazy } from 'react';
 import AppLayout from '@/components/AppLayout';
 import HeroGreeting from './components/HeroGreeting';
 import QuickFeatureCards from './components/QuickFeatureCards';
-import DailyQuoteCard from './components/DailyQuoteCard';
+import MotivationHero from '../daily-motivation/components/MotivationHero';
 import FloatingDoodles from './components/FloatingDoodles';
 
 // Lazy load heavier below-the-fold components
@@ -22,7 +22,7 @@ export default function HomeDashboardPage() {
       <div className="relative space-y-6 py-2">
         <FloatingDoodles />
         <HeroGreeting />
-        <DailyQuoteCard />
+        <MotivationHero />
         <Suspense fallback={<SectionSkeleton />}>
           <WeeklyMoodSummary />
         </Suspense>
