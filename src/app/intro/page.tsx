@@ -28,14 +28,6 @@ const sections = [
     bg: 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-100/60',
     text: 'AureMind exists to help individuals understand their inner world and build emotional balance through reflection, mindfulness, and positive daily habits.',
   },
-  {
-    side: 'right',
-    title: 'About AureMind',
-    emoji: '🧠',
-    gradient: 'from-purple-400 to-pink-400',
-    bg: 'bg-white/70 backdrop-blur-sm border-white/80',
-    text: 'AureMind is a personal mental wellness platform designed to support emotional wellbeing through mood tracking, journaling, self-reflection tools, daily motivation, and community support.',
-  },
 ];
 
 export default function IntroPage() {
@@ -47,16 +39,16 @@ export default function IntroPage() {
   };
 
   const fadeUp = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 24 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.15, duration: 0.6, ease: 'easeOut' },
+      transition: { delay: i * 0.12, duration: 0.55, ease: 'easeOut' },
     }),
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 overflow-x-hidden">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex flex-col">
       {/* Decorative background blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-purple-200/30 blur-3xl" />
@@ -64,7 +56,7 @@ export default function IntroPage() {
         <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-blue-200/20 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-3xl mx-auto px-5 py-12 pb-24">
+      <div className="relative z-10 flex flex-col h-full px-6 py-5 max-w-5xl mx-auto w-full">
 
         {/* ── Header ── */}
         <motion.div
@@ -72,23 +64,23 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-14"
+          className="text-center mb-5 flex-shrink-0"
         >
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
-              <span className="text-3xl">🌸</span>
+          <div className="flex justify-center mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
+              <span className="text-2xl">🌸</span>
             </div>
           </div>
-          <h1 className="font-nunito font-extrabold text-4xl md:text-5xl text-purple-900 tracking-tight mb-3">
+          <h1 className="font-nunito font-extrabold text-3xl md:text-4xl text-purple-900 tracking-tight mb-1">
             AureMind
           </h1>
-          <p className="font-dm font-semibold text-lg text-purple-600 whitespace-nowrap">
+          <p className="font-dm font-semibold text-base text-purple-600 whitespace-nowrap">
             Elevate Your Mind, Embrace Your Calm
           </p>
         </motion.div>
 
-        {/* ── Alternating Sections ── */}
-        <div className="flex flex-col gap-6 mb-12">
+        {/* ── Alternating Floating Sections ── */}
+        <div className="flex flex-col gap-4 flex-1 justify-center">
           {sections.map((section, i) => (
             <motion.div
               key={section.title}
@@ -99,19 +91,20 @@ export default function IntroPage() {
               className={`flex ${section.side === 'right' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`w-full md:w-[78%] rounded-3xl p-7 border shadow-sm ${section.bg}`}
+                className={`w-[72%] md:w-[62%] rounded-3xl p-6 md:p-7 border shadow-lg ${section.bg}`}
+                style={{ backdropFilter: 'blur(12px)' }}
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-3">
                   <div
-                    className={`w-9 h-9 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
+                    className={`w-10 h-10 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
                   >
-                    <span className="text-base">{section.emoji}</span>
+                    <span className="text-lg">{section.emoji}</span>
                   </div>
-                  <h2 className="font-nunito font-bold text-xl text-purple-900">
+                  <h2 className="font-nunito font-bold text-xl md:text-2xl text-purple-900">
                     {section.title}
                   </h2>
                 </div>
-                <p className="font-dm text-sm text-purple-700 leading-relaxed">
+                <p className="font-dm text-sm md:text-base text-purple-700 leading-relaxed">
                   {section.text}
                 </p>
               </div>
@@ -121,11 +114,11 @@ export default function IntroPage() {
 
         {/* ── Continue Button ── */}
         <motion.div
-          custom={5}
+          custom={4}
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="flex justify-center"
+          className="flex justify-center mt-5 flex-shrink-0"
         >
           <motion.button
             whileHover={{ scale: 1.04, y: -2 }}
@@ -139,11 +132,11 @@ export default function IntroPage() {
 
         {/* Footer note */}
         <motion.p
-          custom={6}
+          custom={5}
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center text-xs font-dm text-purple-400 mt-6"
+          className="text-center text-xs font-dm text-purple-400 mt-3 mb-2 flex-shrink-0"
         >
           Your data stays on your device. We respect your privacy.
         </motion.p>
