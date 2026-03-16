@@ -2,6 +2,7 @@ import AppLayout from '@/components/AppLayout';
 import HeroGreeting from './components/HeroGreeting';
 import QuickFeatureCards from './components/QuickFeatureCards';
 import DailyQuoteCard from './components/DailyQuoteCard';
+import WeeklyMoodSummary from './components/WeeklyMoodSummary';
 import WellnessTips from './components/WellnessTips';
 import SoundCards from './components/SoundCards';
 import CommunityPreview from './components/CommunityPreview';
@@ -14,6 +15,7 @@ export default function HomeDashboardPage() {
         <FloatingDoodles />
         <HeroGreeting />
         <DailyQuoteCard />
+        <WeeklyMoodSummary />
         <QuickFeatureCards />
         <WellnessTips />
         <SoundCards />
@@ -21,9 +23,9 @@ export default function HomeDashboardPage() {
         <div className="h-4" />
         {/* Copyright footer */}
         <footer className="text-center py-4 border-t border-purple-100/60">
-          <p className="text-xs font-dm text-purple-400">© 2026 MindBloom. All rights reserved.</p>
+          <p className="text-xs font-dm text-purple-400">© 2026 AureMind. All rights reserved.</p>
         </footer>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>);
+
 }
