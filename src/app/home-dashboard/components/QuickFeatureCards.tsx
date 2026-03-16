@@ -260,7 +260,7 @@ const QuickFeatureCards = memo(function QuickFeatureCards() {
       >
         <motion.div
           className="flex gap-3"
-          animate={{ x: `calc(-${currentIndex} * (100% / ${VISIBLE_COUNT} + 4px))` }}
+          animate={{ x: `calc(-${currentIndex} * (110px + 12px))` }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
           {features.map((f, i) => (
@@ -276,7 +276,6 @@ const QuickFeatureCards = memo(function QuickFeatureCards() {
               onBlur={() => setActiveCard(null)}
               onClick={() => router.push(f.path)}
               className={`relative ${f.gradient} rounded-3xl p-4 flex flex-col items-center gap-1 shadow-sm border border-white/60 cursor-pointer transition-all duration-300 overflow-hidden flex-shrink-0 min-w-[110px] ${activeCard === i ? 'ring-2 ring-purple-300 shadow-lg' : ''}`}
-              style={{ width: `calc((100% - ${(VISIBLE_COUNT - 1) * 12}px) / ${VISIBLE_COUNT})` }}
             >
               <AnimatePresence>
                 {activeCard === i && <CardAnimation type={f.type} />}
@@ -291,7 +290,7 @@ const QuickFeatureCards = memo(function QuickFeatureCards() {
               </motion.span>
               <div className="text-center relative z-10">
                 <p className={`font-nunito font-700 text-xs ${f.textColor} leading-tight`}>{f.title}</p>
-                <p className={`text-[10px] font-dm ${f.textColor} opacity-70 leading-tight mt-0.5 hidden sm:block`}>{f.desc}</p>
+                <p className={`text-[10px] font-dm ${f.textColor} opacity-70 leading-tight mt-0.5`}>{f.desc}</p>
               </div>
             </motion.button>
           ))}
