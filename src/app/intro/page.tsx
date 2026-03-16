@@ -39,11 +39,11 @@ export default function IntroPage() {
   };
 
   const fadeUp = {
-    hidden: { opacity: 0, y: 24 },
+    hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.12, duration: 0.55, ease: 'easeOut' },
+      transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' },
     }),
   };
 
@@ -56,7 +56,7 @@ export default function IntroPage() {
         <div className="absolute bottom-0 left-1/4 w-72 h-72 rounded-full bg-blue-200/20 blur-3xl" />
       </div>
 
-      <div className="relative z-10 flex flex-col h-full px-6 py-5 max-w-5xl mx-auto w-full">
+      <div className="relative z-10 flex flex-col h-full px-6 py-4 max-w-5xl mx-auto w-full">
 
         {/* ── Header ── */}
         <motion.div
@@ -64,23 +64,23 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center mb-5 flex-shrink-0"
+          className="text-center mb-3 flex-shrink-0"
         >
-          <div className="flex justify-center mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
-              <span className="text-2xl">🌸</span>
+          <div className="flex justify-center mb-1.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
+              <span className="text-xl">🌸</span>
             </div>
           </div>
-          <h1 className="font-nunito font-extrabold text-3xl md:text-4xl text-purple-900 tracking-tight mb-1">
+          <h1 className="font-nunito font-extrabold text-2xl md:text-3xl text-purple-900 tracking-tight mb-0.5">
             AureMind
           </h1>
-          <p className="font-dm font-semibold text-base text-purple-600 whitespace-nowrap">
+          <p className="font-dm font-semibold text-sm text-purple-600 whitespace-nowrap">
             Elevate Your Mind, Embrace Your Calm
           </p>
         </motion.div>
 
         {/* ── Alternating Floating Sections ── */}
-        <div className="flex flex-col gap-4 flex-1 justify-center">
+        <div className="flex flex-col gap-3 flex-1 justify-center min-h-0">
           {sections.map((section, i) => (
             <motion.div
               key={section.title}
@@ -88,23 +88,28 @@ export default function IntroPage() {
               initial="hidden"
               animate="visible"
               variants={fadeUp}
-              className={`flex ${section.side === 'right' ? 'justify-end' : 'justify-start'}`}
+              whileHover={{
+                y: -6,
+                boxShadow: '0 20px 40px -8px rgba(139, 92, 246, 0.25)',
+                transition: { duration: 0.25, ease: 'easeOut' },
+              }}
+              className={`flex ${section.side === 'right' ? 'justify-end' : 'justify-start'} cursor-default`}
             >
               <div
-                className={`w-[72%] md:w-[62%] rounded-3xl p-6 md:p-7 border shadow-lg ${section.bg}`}
+                className={`w-[75%] md:w-[65%] rounded-3xl p-4 md:p-5 border shadow-md ${section.bg} transition-shadow duration-300`}
                 style={{ backdropFilter: 'blur(12px)' }}
               >
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2.5 mb-2">
                   <div
-                    className={`w-10 h-10 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
+                    className={`w-9 h-9 rounded-xl bg-gradient-to-br ${section.gradient} flex items-center justify-center shadow-sm flex-shrink-0`}
                   >
-                    <span className="text-lg">{section.emoji}</span>
+                    <span className="text-base">{section.emoji}</span>
                   </div>
-                  <h2 className="font-nunito font-bold text-xl md:text-2xl text-purple-900">
+                  <h2 className="font-nunito font-bold text-lg md:text-xl text-purple-900">
                     {section.title}
                   </h2>
                 </div>
-                <p className="font-dm text-sm md:text-base text-purple-700 leading-relaxed">
+                <p className="font-dm text-xs md:text-sm text-purple-700 leading-relaxed">
                   {section.text}
                 </p>
               </div>
@@ -118,13 +123,13 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="flex justify-center mt-5 flex-shrink-0"
+          className="flex justify-center mt-3 flex-shrink-0"
         >
           <motion.button
             whileHover={{ scale: 1.04, y: -2 }}
             whileTap={{ scale: 0.97 }}
             onClick={handleContinue}
-            className="px-10 py-4 rounded-2xl font-nunito font-bold text-base text-white bg-gradient-to-r from-purple-500 to-pink-400 shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transition-shadow duration-300"
+            className="px-10 py-3 rounded-2xl font-nunito font-bold text-base text-white bg-gradient-to-r from-purple-500 to-pink-400 shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transition-shadow duration-300"
           >
             Continue →
           </motion.button>
@@ -136,7 +141,7 @@ export default function IntroPage() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-center text-xs font-dm text-purple-400 mt-3 mb-2 flex-shrink-0"
+          className="text-center text-xs font-dm text-purple-400 mt-2 mb-1 flex-shrink-0"
         >
           Your data stays on your device. We respect your privacy.
         </motion.p>
