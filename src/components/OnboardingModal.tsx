@@ -73,14 +73,61 @@ export default function OnboardingModal() {
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 className="flex items-center justify-center mb-3"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-lg">
-                  <span className="text-3xl">🌸</span>
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%)',
+                    border: '1.5px solid rgba(167,139,250,0.3)',
+                  }}
+                >
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="omWaveGrad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#7c3aed" />
+                        <stop offset="100%" stopColor="#a855f7" />
+                      </linearGradient>
+                      <linearGradient id="omWaveGrad2" x1="40" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#6d28d9" />
+                        <stop offset="100%" stopColor="#c084fc" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M4 28 C8 28, 10 12, 16 12 C22 12, 24 28, 30 28 C34 28, 36 22, 36 20"
+                      stroke="url(#omWaveGrad1)"
+                      strokeWidth="4.5"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+                    <path
+                      d="M4 20 C8 20, 10 8, 16 8 C22 8, 24 32, 30 32 C34 32, 36 26, 36 24"
+                      stroke="url(#omWaveGrad2)"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      fill="none"
+                      opacity="0.65"
+                    />
+                    <circle cx="20" cy="20" r="2.5" fill="url(#omWaveGrad1)" opacity="0.9" />
+                  </svg>
                 </div>
               </motion.div>
-              <h1 className="font-nunito font-800 text-2xl text-purple-900 tracking-tight">AureMind</h1>
+              <h1
+                className="font-nunito font-extrabold text-2xl tracking-tight"
+                style={{
+                  background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 50%, #a855f7 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                AureMind
+              </h1>
               <div className="mt-1 mb-3">
-                <p className="text-sm font-dm font-semibold text-purple-600 leading-snug">Elevate Your Mind</p>
-                <p className="text-sm font-dm font-semibold text-purple-600 leading-snug">Embrace Your Calm</p>
+                <p
+                  className="text-xs font-dm font-semibold tracking-widest uppercase"
+                  style={{ color: '#7c3aed', opacity: 0.7, letterSpacing: '0.1em' }}
+                >
+                  Elevate Your Mind · Embrace Your Calm
+                </p>
               </div>
               <p className="text-xs font-dm text-purple-400 leading-relaxed px-1">
                 AureMind is your personal mental wellness companion designed to help you understand your emotions, track your mood, and build a healthier mind through reflection, motivation, and community support.

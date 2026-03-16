@@ -115,25 +115,49 @@ export default function IntroPage() {
           {/* Logo mark */}
           <div className="flex justify-center mb-4">
             <div
-              className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
+              className="relative w-20 h-20 rounded-2xl flex items-center justify-center"
               style={{
-                background: 'linear-gradient(135deg, #CDB4DB 0%, #A2D2FF 50%, #FFAFCC 100%)',
-                boxShadow: '0 8px 32px rgba(205,180,219,0.5), 0 2px 8px rgba(162,210,255,0.3)',
+                background: 'linear-gradient(135deg, #ede9fe 0%, #f3e8ff 100%)',
+                boxShadow: '0 8px 32px rgba(124,58,237,0.25), 0 2px 8px rgba(109,40,217,0.15)',
+                border: '1.5px solid rgba(167,139,250,0.35)',
               }}
             >
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4C16 4 8 10 8 18C8 22.4 11.6 26 16 26C20.4 26 24 22.4 24 18C24 10 16 4 16 4Z" fill="white" fillOpacity="0.9"/>
-                <path d="M16 10C16 10 11 14 11 19C11 21.8 13.2 24 16 24C18.8 24 21 21.8 21 19C21 14 16 10 16 10Z" fill="white" fillOpacity="0.5"/>
-                <circle cx="16" cy="19" r="3" fill="white"/>
+              <svg width="48" height="48" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="introWaveGrad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#7c3aed" />
+                    <stop offset="100%" stopColor="#a855f7" />
+                  </linearGradient>
+                  <linearGradient id="introWaveGrad2" x1="40" y1="0" x2="0" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stopColor="#6d28d9" />
+                    <stop offset="100%" stopColor="#c084fc" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M4 28 C8 28, 10 12, 16 12 C22 12, 24 28, 30 28 C34 28, 36 22, 36 20"
+                  stroke="url(#introWaveGrad1)"
+                  strokeWidth="4.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+                <path
+                  d="M4 20 C8 20, 10 8, 16 8 C22 8, 24 32, 30 32 C34 32, 36 26, 36 24"
+                  stroke="url(#introWaveGrad2)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  fill="none"
+                  opacity="0.65"
+                />
+                <circle cx="20" cy="20" r="2.5" fill="url(#introWaveGrad1)" opacity="0.9" />
               </svg>
               {/* Glow ring */}
               <div
                 className="absolute inset-0 rounded-2xl"
                 style={{
-                  background: 'linear-gradient(135deg, #CDB4DB, #A2D2FF, #FFAFCC)',
-                  opacity: 0.4,
-                  filter: 'blur(8px)',
-                  transform: 'scale(1.3)',
+                  background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                  opacity: 0.2,
+                  filter: 'blur(10px)',
+                  transform: 'scale(1.35)',
                   zIndex: -1,
                 }}
               />
@@ -141,9 +165,9 @@ export default function IntroPage() {
           </div>
 
           <h1
-            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-3"
+            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-2"
             style={{
-              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #be185d 100%)',
+              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #a855f7 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -153,10 +177,10 @@ export default function IntroPage() {
             AureMind
           </h1>
           <p
-            className="font-dm font-medium text-base md:text-lg tracking-wide"
-            style={{ color: '#7c3aed', opacity: 0.75 }}
+            className="font-dm font-semibold text-sm md:text-base tracking-widest uppercase mb-1"
+            style={{ color: '#7c3aed', opacity: 0.72, letterSpacing: '0.14em' }}
           >
-            Elevate Your Mind, Embrace Your Calm
+            Elevate Your Mind · Embrace Your Calm
           </p>
 
           {/* Decorative line */}
