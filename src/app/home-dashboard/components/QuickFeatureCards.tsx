@@ -275,7 +275,7 @@ const QuickFeatureCards = memo(function QuickFeatureCards() {
               onFocus={() => setActiveCard(i)}
               onBlur={() => setActiveCard(null)}
               onClick={() => router.push(f.path)}
-              className={`relative ${f.gradient} rounded-3xl p-4 flex flex-col items-center gap-1 shadow-sm border border-white/60 cursor-pointer transition-all duration-300 overflow-hidden flex-shrink-0 min-w-[110px] ${activeCard === i ? 'ring-2 ring-purple-300 shadow-lg' : ''}`}
+              className={`relative ${f.gradient} rounded-3xl p-4 flex flex-col items-center gap-3 shadow-sm border border-white/60 cursor-pointer transition-all duration-300 overflow-hidden flex-shrink-0 min-w-[100px] min-h-[44px] ${activeCard === i ? 'ring-2 ring-purple-300 shadow-lg' : ''}`}
             >
               <AnimatePresence>
                 {activeCard === i && <CardAnimation type={f.type} />}
