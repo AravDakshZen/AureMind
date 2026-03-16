@@ -23,9 +23,9 @@ export default function HomeDashboardPage() {
         <div className="h-4" />
         {/* Copyright footer */}
         <footer className="text-center py-4 border-t border-purple-100/60">
-          <p className="text-xs font-dm text-purple-400">© 2026 MindBloom. All rights reserved.</p>
+          <p className="text-xs font-dm text-purple-400">© 2026 AureMind. All rights reserved.</p>
         </footer>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>);
+
 }
