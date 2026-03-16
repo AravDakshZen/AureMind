@@ -2,6 +2,7 @@ import AppLayout from '@/components/AppLayout';
 import HeroGreeting from './components/HeroGreeting';
 import QuickFeatureCards from './components/QuickFeatureCards';
 import DailyQuoteCard from './components/DailyQuoteCard';
+import WeeklyMoodSummary from './components/WeeklyMoodSummary';
 import WellnessTips from './components/WellnessTips';
 import SoundCards from './components/SoundCards';
 import CommunityPreview from './components/CommunityPreview';
@@ -14,6 +15,7 @@ export default function HomeDashboardPage() {
         <FloatingDoodles />
         <HeroGreeting />
         <DailyQuoteCard />
+        <WeeklyMoodSummary />
         <QuickFeatureCards />
         <WellnessTips />
         <SoundCards />
