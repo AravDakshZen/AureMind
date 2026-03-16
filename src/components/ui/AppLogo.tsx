@@ -12,7 +12,7 @@ interface AppLogoProps {
 }
 
 const AppLogo = memo(function AppLogo({
-  size = 36,
+  size = 44,
   className = '',
   onClick,
 }: AppLogoProps) {
@@ -26,9 +26,9 @@ const AppLogo = memo(function AppLogo({
       {/* Logo Image */}
       <div className="flex-shrink-0 relative" style={{ width: iconSize, height: iconSize }}>
         <img
-          src="/assets/images/Screenshot_2026-03-16_171145-1773661382444.png"
+          src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773661537529.png"
           alt="AureMind logo"
-          style={{ width: iconSize, height: iconSize, objectFit: 'contain' }}
+          style={{ width: 'auto', height: iconSize, objectFit: 'contain' }}
         />
       </div>
       {/* Brand Name */}
