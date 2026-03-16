@@ -1,8 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Heart } from 'lucide-react';
 
 const quotes = [
   { text: "You don't have to be positive all the time. It's perfectly okay to feel sad, angry, annoyed, or overwhelmed.", author: 'Lori Deschene' },
@@ -19,7 +17,6 @@ function getDailyQuote() {
 }
 
 export default function DailyQuoteCard() {
-  const [liked, setLiked] = useState(false);
   const quote = getDailyQuote();
 
   return (
@@ -31,18 +28,11 @@ export default function DailyQuoteCard() {
     >
       <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-purple-200/40 blur-2xl -translate-y-8 translate-x-8" />
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-center mb-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">💫</span>
             <p className="font-nunito font-700 text-sm text-purple-800 uppercase tracking-wide">Daily Motivation</p>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            onClick={() => setLiked(!liked)}
-            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${liked ? 'bg-pink-200 text-pink-600' : 'bg-white/60 text-purple-400'}`}
-          >
-            <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
-          </motion.button>
         </div>
 
         <div className="text-center">
