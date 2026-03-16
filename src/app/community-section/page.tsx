@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
 import CommunityFeed from './components/CommunityFeed';
 import CommunityHeader from './components/CommunityHeader';
@@ -9,12 +9,17 @@ import CommunityGuidelinesModal from './components/CommunityGuidelinesModal';
 const GUIDELINES_KEY = 'mindbloom_community_guidelines_accepted';
 
 export default function CommunitySectionPage() {
-  const [guidelinesAccepted, setGuidelinesAccepted] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(GUIDELINES_KEY) === 'true';
-    }
-    return false;
-  });
+  const [guidelinesAccepted, setGuidelinesAccepted] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const accepted = localStorage.getItem(GUIDELINES_KEY) === 'true';
+    setGuidelinesAccepted(accepted);
+  }, []);
+
+  // Don't render anything until we've checked localStorage on the client
+  if (guidelinesAccepted === null) {
+    return <AppLayout><div /></AppLayout>;
+  }
 
   return (
     <AppLayout>
