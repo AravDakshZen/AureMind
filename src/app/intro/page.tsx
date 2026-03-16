@@ -1,12 +1,18 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 export default function IntroPage() {
   const router = useRouter();
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-reveal refs
+  const card1Ref = useRef<HTMLDivElement>(null);
+  const card2Ref = useRef<HTMLDivElement>(null);
+  const card3Ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -21,6 +27,49 @@ export default function IntroPage() {
     localStorage.setItem('auremind_intro_seen', 'true');
     router.push('/home-dashboard');
   };
+
+  // Intersection Observer for scroll-triggered animations
+  useEffect(() => {
+    const elements = [
+      { ref: card1Ref, delay: 0 },
+      { ref: card2Ref, delay: 120 },
+      { ref: card3Ref, delay: 240 },
+      { ref: btnRef, delay: 360 },
+    ];
+
+    const observers: IntersectionObserver[] = [];
+
+    elements.forEach(({ ref, delay }) => {
+      if (!ref.current) return;
+      const el = ref.current;
+
+      // Set initial hidden state
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(48px)';
+      el.style.transition = 'none';
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                el.style.transition = 'opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1)';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+              }, delay);
+              observer.unobserve(el);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
 
   return (
     <div
@@ -111,34 +160,15 @@ export default function IntroPage() {
       <div className="relative z-10 flex flex-col min-h-screen px-5 md:px-10 py-8 max-w-5xl mx-auto w-full">
 
         {/* Header — brand identity */}
-        <div className="text-center mb-10 md:mb-14">
+        <div className="text-center mb-10 md:mb-14" style={{ animation: 'slideInDown 0.8s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
           {/* Logo image */}
           <div className="flex justify-center mb-4">
             <img
-              src="/assets/images/ChatGPT_Image_Mar_16__2026__04_53_43_PM-1773660498579.png"
+              src="/assets/images/ChatGPT_Image_Mar_16__2026__04_44_37_PM-1773661537529.png"
               alt="AureMind logo"
-              style={{ width: '100px', height: '100px', objectFit: 'contain' }}
+              style={{ width: '620px', height: '620px', objectFit: 'contain' }}
             />
           </div>
-
-          <h1
-            className="font-nunito font-extrabold text-5xl md:text-6xl tracking-tight mb-2"
-            style={{
-              background: 'linear-gradient(135deg, #6b21a8 0%, #7c3aed 40%, #a855f7 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            AureMind
-          </h1>
-          <p
-            className="font-dm font-semibold text-sm md:text-base tracking-widest uppercase mb-1"
-            style={{ color: '#7c3aed', opacity: 0.72, letterSpacing: '0.14em' }}
-          >
-            Elevate Your Mind · Embrace Your Calm
-          </p>
 
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-4">
@@ -153,6 +183,7 @@ export default function IntroPage() {
 
           {/* Problem Statement — large card, spans 7 cols */}
           <div
+            ref={card1Ref}
             className="md:col-span-7 rounded-3xl p-7 md:p-8 relative overflow-hidden group"
             style={{
               background: 'rgba(255,255,255,0.62)',
@@ -221,6 +252,7 @@ export default function IntroPage() {
 
           {/* Why We Exist — tall card, spans 5 cols */}
           <div
+            ref={card2Ref}
             className="md:col-span-5 rounded-3xl p-7 relative overflow-hidden"
             style={{
               background: 'rgba(255,255,255,0.55)',
@@ -281,6 +313,7 @@ export default function IntroPage() {
 
           {/* Solution — full width bottom card */}
           <div
+            ref={card3Ref}
             className="md:col-span-12 rounded-3xl p-7 md:p-8 relative overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, rgba(255,175,204,0.35) 0%, rgba(255,200,221,0.25) 40%, rgba(205,180,219,0.3) 100%)',
@@ -357,7 +390,7 @@ export default function IntroPage() {
         </div>
 
         {/* Continue button */}
-        <div className="flex flex-col items-center gap-3 pb-8">
+        <div ref={btnRef} className="flex flex-col items-center gap-3 pb-8">
           <button
             onClick={handleContinue}
             className="relative group px-12 py-4 rounded-2xl font-nunito font-bold text-base text-white overflow-hidden"
@@ -421,6 +454,10 @@ export default function IntroPage() {
         @keyframes floatParticle {
           0%, 100% { transform: translateY(0px) scale(1); opacity: 0.6; }
           50% { transform: translateY(-18px) scale(1.2); opacity: 0.9; }
+        }
+        @keyframes slideInDown {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
     </div>
