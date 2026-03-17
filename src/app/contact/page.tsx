@@ -1,7 +1,6 @@
 'use client';
 
 import AppLayout from '@/components/AppLayout';
-import { motion } from 'framer-motion';
 import { Mail, Phone, MessageCircle, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -63,24 +62,19 @@ export default function ContactPage() {
     <AppLayout>
       <div className="space-y-5 py-2">
         <div className="flex items-center gap-3">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
+          <button
             onClick={() => router?.push('/daily-motivation')}
-            className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-2xl bg-white/70 border border-purple-100 flex items-center justify-center text-purple-600 hover:bg-white transition-colors"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 rounded-2xl bg-white/70 border border-purple-100 flex items-center justify-center text-purple-600 hover:bg-white transition-colors active:scale-90"
           >
             <ArrowLeft size={18} />
-          </motion.button>
+          </button>
           <div>
             <h1 className="font-nunito font-800 text-2xl text-purple-900">Consult an Expert 💬</h1>
             <p className="text-sm font-dm text-purple-500 mt-0.5">Connect with a mental health professional</p>
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-50 border border-amber-200 rounded-3xl p-4 flex items-start gap-3"
-        >
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-4 flex items-start gap-3">
           <span className="text-xl flex-shrink-0">⚠️</span>
           <div>
             <p className="font-nunito font-700 text-sm text-amber-800 mb-1">Professional Support</p>
@@ -88,15 +82,12 @@ export default function ContactPage() {
               These professionals are available for consultations. For emergencies, please call your local crisis helpline immediately.
             </p>
           </div>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {professionals?.map((pro, i) => (
-            <motion.div
+            <div
               key={pro?.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
               className={`${pro?.gradient} rounded-4xl p-5 border border-white/60 shadow-md`}
             >
               <div className="flex items-start gap-3 mb-4">
@@ -125,8 +116,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex gap-2">
-                <motion.a
-                  whileTap={{ scale: 0.95 }}
+                <a
                   href={`https://wa.me/${pro?.whatsapp}?text=Hi%20${encodeURIComponent(pro?.name)}%2C%20I%20found%20you%20on%20AureMind%20and%20would%20like%20to%20book%20a%20consultation.`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -134,17 +124,16 @@ export default function ContactPage() {
                 >
                   <MessageCircle size={14} />
                   WhatsApp
-                </motion.a>
-                <motion.a
-                  whileTap={{ scale: 0.95 }}
+                </a>
+                <a
                   href={`mailto:${pro?.email}?subject=Consultation%20Request%20via%20AureMind`}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-2xl bg-white/70 border border-white/60 font-nunito font-700 text-xs transition-colors hover:bg-white/90 min-h-[44px]"
                 >
                   <Mail size={14} className={pro?.textColor} />
                   <span className={pro?.textColor}>Email</span>
-                </motion.a>
+                </a>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
