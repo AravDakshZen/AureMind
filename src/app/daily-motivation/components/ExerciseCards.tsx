@@ -210,7 +210,7 @@ function StretchAnimation({ phase }: { phase: string }) {
 // In-card breathing circle animation (looping, no phase)
 function CardBreathingAnim() {
   return (
-    <div className="relative flex items-center justify-center w-16 h-16 mx-auto my-1">
+    <div className="relative flex items-center justify-center w-16 h-16 mx-auto">
       <motion.div
         className="absolute rounded-full bg-blue-300/30 border border-blue-400/40"
         animate={{ scale: [0.7, 1.4, 0.7] }}
@@ -229,13 +229,15 @@ function CardBreathingAnim() {
 // In-card stretch animation (looping)
 function CardStretchAnim({ emoji }: { emoji: string }) {
   return (
-    <motion.span
-      className="text-3xl block text-center my-1"
-      animate={{ rotate: [-8, 8, -8], y: [0, -4, 0] }}
-      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-    >
-      {emoji}
-    </motion.span>
+    <div className="flex items-center justify-center w-16 h-16 mx-auto">
+      <motion.span
+        className="text-3xl block text-center"
+        animate={{ rotate: [-8, 8, -8], y: [0, -4, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        {emoji}
+      </motion.span>
+    </div>
   );
 }
 
@@ -455,16 +457,18 @@ export default function ExerciseCards() {
             onClick={() => setSelectedExercise(ex)}
             className={`relative bg-gradient-to-br ${ex.gradient} rounded-3xl p-4 flex flex-col items-center min-w-[110px] w-[110px] h-[190px] border border-white/60 shadow-sm transition-shadow duration-300 overflow-hidden`}
           >
-            {/* Top content area - fixed height */}
-            <div className="flex flex-col items-center flex-1 w-full">
-              {/* In-card animation */}
-              {ex.type === 'breathing' ? (
-                <CardBreathingAnim />
-              ) : (
-                <CardStretchAnim emoji={ex.emoji} />
-              )}
+            {/* Top content area - flex-1 pushes button to bottom */}
+            <div className="flex flex-col items-center w-full flex-1 min-h-0">
+              {/* Fixed-height animation container so all cards align consistently */}
+              <div className="w-16 h-16 flex items-center justify-center shrink-0">
+                {ex.type === 'breathing' ? (
+                  <CardBreathingAnim />
+                ) : (
+                  <CardStretchAnim emoji={ex.emoji} />
+                )}
+              </div>
               <p className={`font-nunito font-700 text-xs ${ex.textColor} text-center leading-tight mt-1`}>{ex.name}</p>
-              <p className={`text-[10px] font-dm ${ex.textColor} opacity-60 text-center mt-0.5`}>{ex.desc}</p>
+              <p className={`text-[10px] font-dm ${ex.textColor} opacity-60 text-center mt-0.5 line-clamp-2`}>{ex.desc}</p>
             </div>
             {/* Button always at bottom */}
             <div className={`mt-2 px-3 py-1 rounded-xl bg-white/50 border border-white/60 shrink-0`}>
