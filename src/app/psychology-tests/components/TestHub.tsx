@@ -171,24 +171,6 @@ export default function TestHub() {
         ))}
       </div>
 
-      {/* Past results from localStorage */}
-      <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-4 border border-white/60 shadow-sm">
-        <h3 className="font-nunito font-700 text-sm text-purple-900 mb-3">Recent Reflections 📋</h3>
-        <div className="space-y-2.5">
-          {pastResults.length > 0 ? pastResults.slice(0, 5).map((r, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-2xl border bg-purple-50 border-purple-100 text-purple-700">
-              <span className="text-xl">{r.emoji}</span>
-              <div className="flex-1">
-                <p className="font-nunito font-700 text-xs text-purple-900">{r.test}</p>
-                <p className="text-xs font-dm text-purple-500">{r.result}</p>
-              </div>
-              <p className="text-[10px] font-dm text-purple-400">{r.date}</p>
-            </div>
-          )) : (
-            <p className="text-xs font-dm text-purple-400 text-center py-2">Complete a test to see your reflections here</p>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
